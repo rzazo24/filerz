@@ -792,6 +792,14 @@
     const ext = (name.split('.').pop() || '').slice(0, 3).toUpperCase();
     return ext || '·';
   }
+  const SHORT_ID_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; // sin 0/O/1/l/I
+  function generateShortId() {
+    let id = '';
+    for (let i = 0; i < 8; i++) {
+      id += SHORT_ID_ALPHABET[Math.floor(Math.random() * SHORT_ID_ALPHABET.length)];
+    }
+    return id;
+  }
   let currentStatusKey = 'statusReady';
   function setLive(on, key) {
     currentStatusKey = key;
@@ -1181,7 +1189,11 @@
       setKeyedText(senderStatus, 'creatingLink');
       setLive(false, 'preparing');
 
-      peer = new Peer();
+      startPeer(4);
+    }
+
+    function startPeer(idRetriesLeft) {
+      peer = new Peer(generateShortId());
 
       peer.on('open', (id) => {
         const url = location.origin + location.pathname + '#r=' + id;
@@ -1245,6 +1257,11 @@
       });
 
       peer.on('error', (err) => {
+        if (err.type === 'unavailable-id' && idRetriesLeft > 0) {
+          peer.destroy();
+          startPeer(idRetriesLeft - 1);
+          return;
+        }
         setLive(false, 'errorWord');
         setKeyedText(senderStatus, 'senderError', { type: err.type });
         senderStatus.className = 'status error';

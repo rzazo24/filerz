@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-24
+
+### Changed
+- El enlace generado es mucho más corto: en vez del UUID largo que asignaba por defecto el broker de PeerJS Cloud, ahora se genera un ID propio de 8 caracteres (sin `0/O/1/l/I` para evitar confusiones). Si por casualidad coincide con uno ya en uso, se reintenta automáticamente con uno nuevo hasta 4 veces antes de mostrar un error.
+
 ## [0.8.5] - 2026-09-24
 
 ### Added
@@ -133,7 +138,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.5...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/rzazo24/filerz/compare/v0.8.5...v0.9.0
 [0.8.5]: https://github.com/rzazo24/filerz/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/rzazo24/filerz/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/rzazo24/filerz/compare/v0.8.2...v0.8.3
