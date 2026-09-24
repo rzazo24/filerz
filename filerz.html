@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Filerz — transferencia directa de archivos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg: #14151C;
+    --bg-2: #191B24;
+    --surface: #1E202B;
+    --surface-2: #262838;
+    --text: #EDEEF5;
+    --text-soft: #9496AC;
+    --accent: #7C6FF0;
+    --accent-dim: #5A4FC7;
+    --accent-soft: rgba(124,111,240,0.14);
+    --ok: #4FD1C5;
+    --danger: #F76C6C;
+    --line: rgba(255,255,255,0.09);
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --bg: #F3F2F8;
+    --bg-2: #EAE8F3;
+    --surface: #FFFFFF;
+    --surface-2: #F1EFFA;
+    --text: #1B1C26;
+    --text-soft: #6B6D82;
+    --accent: #6C5CE7;
+    --accent-dim: #5647C4;
+    --accent-soft: rgba(108,92,231,0.10);
+    --ok: #14A38F;
+    --danger: #D14D4D;
+    --line: rgba(20,20,40,0.09);
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background:
+      radial-gradient(720px 480px at 12% -10%, var(--accent-soft), transparent 60%),
+      radial-gradient(600px 420px at 110% 10%, rgba(79,209,197,0.08), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    padding: calc(env(safe-area-inset-top, 0px) + 28px) 20px calc(env(safe-area-inset-bottom, 0px) + 28px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 22px 22px 22px 6px;
+    padding: 26px 24px 22px;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,0.5);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .top h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 21px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: var(--text-soft);
+    background: var(--surface-2);
+    padding: 5px 11px 5px 9px;
+    border-radius: 100px;
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-soft);
+    flex-shrink: 0;
+  }
+  .dot.live {
+    background: var(--ok);
+    box-shadow: 0 0 0 0 rgba(79,209,197,0.55);
+    animation: pulse 1.8s ease-out infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(79,209,197,0.5); }
+    70%  { box-shadow: 0 0 0 8px rgba(79,209,197,0); }
+    100% { box-shadow: 0 0 0 0 rgba(79,209,197,0); }
+  }
+
+  .drop {
+    border: 1.5px dashed var(--line);
+    border-radius: 14px;
+    padding: 34px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .drop:hover, .drop.drag {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .drop p { margin: 0; font-size: 15px; font-weight: 500; }
+  .drop small {
+    display: block;
+    margin-top: 6px;
+    color: var(--text-soft);
+    font-size: 12.5px;
+  }
+  input[type="file"] { display: none; }
+
+  .file-card {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: var(--surface-2);
+  }
+  .file-card.show { display: flex; }
+  .file-glyph {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600;
+    flex-shrink: 0;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .file-info { min-width: 0; }
+  .file-name {
+    font-weight: 600;
+    font-size: 14.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .file-meta { font-size: 12.5px; color: var(--text-soft); margin-top: 1px; }
+
+  .share {
+    display: none;
+    margin-top: 18px;
+    gap: 14px;
+    align-items: center;
+  }
+  .share.show { display: flex; }
+  .qr-chip {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 8px;
+    flex-shrink: 0;
+    line-height: 0;
+  }
+  .qr-chip img, .qr-chip canvas { display: block; border-radius: 4px; }
+  .share-right { flex: 1; min-width: 0; }
+  .share-right p {
+    margin: 0 0 8px;
+    font-size: 12.5px;
+    color: var(--text-soft);
+  }
+  .link-row { display: flex; gap: 6px; }
+  .link-input {
+    flex: 1;
+    min-width: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  button {
+    font-family: 'Inter', inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    cursor: pointer;
+    background: var(--accent);
+    color: #ffffff;
+    transition: background .15s ease, transform .05s ease;
+    white-space: nowrap;
+  }
+  button:hover { background: var(--accent-dim); }
+  button:active { transform: translateY(1px); }
+  button.full { width: 100%; padding: 12px; font-size: 14.5px; }
+
+  .progress-wrap { margin-top: 18px; display: none; }
+  .progress-wrap.show { display: block; }
+  .progress-track {
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--ok));
+    transition: width .12s linear;
+    border-radius: 4px;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-soft);
+    margin-top: 7px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .status {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-soft);
+    line-height: 1.5;
+    min-height: 18px;
+  }
+  .status.error { color: var(--danger); }
+  .status.ready { color: var(--ok); }
+
+  .footer-note {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 11.5px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 380px) {
+    .share { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="top">
+    <h1>Filerz</h1>
+    <div class="pill"><span class="dot" id="statusDot"></span><span id="statusLabel">listo</span></div>
+  </div>
+
+  <div id="senderView">
+    <div class="drop" id="drop">
+      <p>Suelta un archivo aquí o toca para elegirlo</p>
+      <small>Viaja directo al otro navegador, sin pasar por ningún servidor</small>
+    </div>
+    <input type="file" id="fileInput">
+
+    <div class="file-card" id="fileCard">
+      <div class="file-glyph" id="fileGlyph">·</div>
+      <div class="file-info">
+        <div class="file-name" id="fileName"></div>
+        <div class="file-meta" id="fileMeta"></div>
+      </div>
+    </div>
+
+    <div class="share" id="shareRow">
+      <div class="qr-chip" id="qrChip"></div>
+      <div class="share-right">
+        <p>Escanea o comparte el enlace</p>
+        <div class="link-row">
+          <input class="link-input" id="linkInput" readonly>
+          <button id="copyBtn">Copiar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-wrap" id="sendProgressWrap">
+      <div class="progress-track"><div class="progress-fill" id="sendFill"></div></div>
+      <div class="progress-label"><span id="sendPct">0%</span><span id="sendState">esperando destinatario</span></div>
+    </div>
+
+    <div class="status" id="senderStatus">Al elegir un archivo se generará un enlace y un código QR de un solo uso.</div>
+  </div>
+
+  <div id="receiverView" style="display:none">
+    <div class="file-card" id="recvFileCard">
+      <div class="file-glyph" id="recvGlyph">·</div>
+      <div class="file-info">
+        <div class="file-name" id="recvFileName">Conectando…</div>
+        <div class="file-meta" id="recvFileMeta"></div>
+      </div>
+    </div>
+    <div class="progress-wrap show">
+      <div class="progress-track"><div class="progress-fill" id="recvFill"></div></div>
+      <div class="progress-label"><span id="recvPct">0%</span><span id="recvState">esperando datos</span></div>
+    </div>
+    <a class="download-btn" id="downloadBtn" style="display:none; margin-top:16px;">
+      <button class="full">Descargar archivo</button>
+    </a>
+    <div class="status" id="receiverStatus"></div>
+  </div>
+
+  <div class="footer-note">
+    Transferencia directa entre navegadores (WebRTC). Ambas pestañas deben permanecer abiertas mientras dura la copia.
+  </div>
+</div>
+
+<script>
+(function () {
+  const CHUNK_SIZE = 16 * 1024;
+  const params = new URLSearchParams(location.hash.slice(1));
+  const receiveId = params.get('r');
+
+  const statusDot = document.getElementById('statusDot');
+  const statusLabel = document.getElementById('statusLabel');
+  const senderView = document.getElementById('senderView');
+  const receiverView = document.getElementById('receiverView');
+
+  function fmtBytes(n) {
+    if (n < 1024) return n + ' B';
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+    return (n / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+  function extGlyph(name) {
+    const ext = (name.split('.').pop() || '').slice(0, 3).toUpperCase();
+    return ext || '·';
+  }
+  function setLive(on, label) {
+    statusDot.classList.toggle('live', !!on);
+    statusLabel.textContent = label;
+  }
+
+  if (receiveId) {
+    // ---------- RECEIVER ----------
+    senderView.style.display = 'none';
+    receiverView.style.display = 'block';
+    setLive(false, 'conectando');
+
+    const recvGlyph = document.getElementById('recvGlyph');
+    const recvFileName = document.getElementById('recvFileName');
+    const recvFileMeta = document.getElementById('recvFileMeta');
+    const recvFill = document.getElementById('recvFill');
+    const recvPct = document.getElementById('recvPct');
+    const recvState = document.getElementById('recvState');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const receiverStatus = document.getElementById('receiverStatus');
+
+    let meta = null;
+    let received = [];
+    let receivedBytes = 0;
+
+    const peer = new Peer();
+    peer.on('open', () => {
+      const conn = peer.connect(receiveId, { reliable: true });
+      conn.on('open', () => {
+        setLive(true, 'conectado');
+        receiverStatus.textContent = 'Conectado. Esperando que empiece el envío…';
+      });
+      conn.on('data', (msg) => {
+        if (msg && msg.type === 'meta') {
+          meta = msg;
+          recvGlyph.textContent = extGlyph(meta.name);
+          recvFileName.textContent = meta.name;
+          recvFileMeta.textContent = fmtBytes(meta.size);
+          recvState.textContent = 'recibiendo';
+        } else if (msg && msg.type === 'chunk') {
+          const buf = msg.data;
+          received.push(buf);
+          receivedBytes += buf.byteLength;
+          const pct = meta ? Math.min(100, Math.round((receivedBytes / meta.size) * 100)) : 0;
+          recvFill.style.width = pct + '%';
+          recvPct.textContent = pct + '%';
+        } else if (msg && msg.type === 'done') {
+          recvState.textContent = 'completo';
+          setLive(true, 'terminado');
+          const blob = new Blob(received, { type: meta.mime || 'application/octet-stream' });
+          const url = URL.createObjectURL(blob);
+          downloadBtn.href = url;
+          downloadBtn.download = meta.name;
+          downloadBtn.style.display = 'block';
+          receiverStatus.textContent = 'Archivo recibido completo.';
+          receiverStatus.className = 'status ready';
+        }
+      });
+      conn.on('error', (err) => {
+        receiverStatus.textContent = 'Error de conexión: ' + err;
+        receiverStatus.className = 'status error';
+      });
+    });
+    peer.on('error', (err) => {
+      setLive(false, 'error');
+      receiverStatus.textContent = 'No se pudo conectar (' + err.type + '). El enlace puede haber caducado.';
+      receiverStatus.className = 'status error';
+    });
+
+  } else {
+    // ---------- SENDER ----------
+    const drop = document.getElementById('drop');
+    const fileInput = document.getElementById('fileInput');
+    const fileCard = document.getElementById('fileCard');
+    const fileGlyph = document.getElementById('fileGlyph');
+    const fileName = document.getElementById('fileName');
+    const fileMeta = document.getElementById('fileMeta');
+    const shareRow = document.getElementById('shareRow');
+    const qrChip = document.getElementById('qrChip');
+    const linkInput = document.getElementById('linkInput');
+    const copyBtn = document.getElementById('copyBtn');
+    const sendProgressWrap = document.getElementById('sendProgressWrap');
+    const sendFill = document.getElementById('sendFill');
+    const sendPct = document.getElementById('sendPct');
+    const sendState = document.getElementById('sendState');
+    const senderStatus = document.getElementById('senderStatus');
+
+    let selectedFile = null;
+    let peer = null;
+
+    drop.addEventListener('click', () => fileInput.click());
+    drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('drag'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
+    drop.addEventListener('drop', (e) => {
+      e.preventDefault();
+      drop.classList.remove('drag');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      selectedFile = file;
+      fileCard.classList.add('show');
+      fileGlyph.textContent = extGlyph(file.name);
+      fileName.textContent = file.name;
+      fileMeta.textContent = fmtBytes(file.size);
+      senderStatus.textContent = 'Creando enlace…';
+      setLive(false, 'preparando');
+
+      if (peer) peer.destroy();
+      peer = new Peer();
+
+      peer.on('open', (id) => {
+        const url = location.origin + location.pathname + '#r=' + id;
+        linkInput.value = url;
+        shareRow.classList.add('show');
+        qrChip.innerHTML = '';
+        new QRCode(qrChip, {
+          text: url,
+          width: 108,
+          height: 108,
+          colorDark: '#14151C',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        setLive(true, 'esperando');
+        senderStatus.textContent = 'Comparte el enlace o el QR. En cuanto se abra, empezará la copia.';
+      });
+
+      peer.on('connection', (conn) => {
+        sendProgressWrap.classList.add('show');
+        sendState.textContent = 'destinatario conectado';
+
+        conn.on('open', () => {
+          conn.send({ type: 'meta', name: selectedFile.name, size: selectedFile.size, mime: selectedFile.type });
+          sendFileInChunks(conn, selectedFile);
+        });
+      });
+
+      peer.on('error', (err) => {
+        setLive(false, 'error');
+        senderStatus.textContent = 'Error: ' + err.type;
+        senderStatus.className = 'status error';
+      });
+    }
+
+    function sendFileInChunks(conn, file) {
+      let offset = 0;
+      const reader = new FileReader();
+
+      function readNext() {
+        const slice = file.slice(offset, offset + CHUNK_SIZE);
+        reader.readAsArrayBuffer(slice);
+      }
+
+      reader.onload = (e) => {
+        conn.send({ type: 'chunk', data: e.target.result });
+        offset += e.target.result.byteLength;
+        const pct = Math.min(100, Math.round((offset / file.size) * 100));
+        sendFill.style.width = pct + '%';
+        sendPct.textContent = pct + '%';
+        sendState.textContent = 'enviando';
+
+        if (offset < file.size) {
+          readNext();
+        } else {
+          conn.send({ type: 'done' });
+          sendState.textContent = 'completado';
+          setLive(true, 'completado');
+          senderStatus.textContent = 'Entrega completa.';
+          senderStatus.className = 'status ready';
+        }
+      };
+
+      readNext();
+    }
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(linkInput.value).then(() => {
+        copyBtn.textContent = 'Copiado';
+        setTimeout(() => { copyBtn.textContent = 'Copiar'; }, 1500);
+      });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
