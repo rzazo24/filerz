@@ -326,6 +326,7 @@
     color: var(--text-soft);
   }
   .link-row { display: flex; gap: 6px; }
+  .link-row + .code-only-hint { margin-top: 12px; }
   .link-input {
     flex: 1;
     min-width: 0;
@@ -579,7 +580,12 @@
         <p data-i18n="shareHint">Escanea o comparte el enlace</p>
         <div class="link-row">
           <input class="link-input" id="linkInput" readonly>
-          <button id="copyBtn" data-i18n="copyBtn">Copiar</button>
+          <button id="copyBtn" aria-label="Copiar enlace" data-i18n="copyBtn" data-i18n-label="copyLinkAriaLabel">Copiar</button>
+        </div>
+        <p class="code-only-hint" data-i18n="codeOnlyHint">O solo el código:</p>
+        <div class="link-row">
+          <input class="link-input code-input" id="codeOnlyInput" readonly>
+          <button id="copyCodeBtn" aria-label="Copiar código" data-i18n="copyBtn" data-i18n-label="copyCodeAriaLabel">Copiar</button>
         </div>
       </div>
     </div>
@@ -636,7 +642,7 @@
     </div>
     <div class="modal-body">
       <h3 data-i18n="helpSendHeading">Enviar un archivo</h3>
-      <p data-i18n="helpSendBody">Elige o suelta un archivo. Se genera un enlace y un código QR de un solo uso: compártelo con quien vaya a recibirlo, por el medio que prefieras.</p>
+      <p data-i18n="helpSendBody">Elige o suelta un archivo. Se genera un enlace y un código QR de un solo uso: compártelo con quien vaya a recibirlo, por el medio que prefieras. Debajo del enlace hay un campo con solo el código, más cómodo de copiar o dictar en pantallas pequeñas.</p>
       <h3 data-i18n="helpReceiveHeading">Recibir un archivo</h3>
       <p data-i18n="helpReceiveBody">Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo. Si no tienes el enlace a mano, en la pantalla principal puedes escribir el código o escanear el QR con el botón dedicado.</p>
       <h3 data-i18n="helpNotesHeading">A tener en cuenta</h3>
@@ -686,6 +692,9 @@
       cancelAriaLabel: 'Cancelar y elegir otro archivo',
       shareHint: 'Escanea o comparte el enlace',
       copyBtn: 'Copiar',
+      copyLinkAriaLabel: 'Copiar enlace',
+      copyCodeAriaLabel: 'Copiar código',
+      codeOnlyHint: 'O solo el código:',
       copiedFlash: 'Copiado',
       waitingRecipient: 'esperando destinatario',
       senderDefaultStatus: 'Al elegir un archivo se generará un enlace y un código QR de un solo uso.',
@@ -772,6 +781,9 @@
       cancelAriaLabel: 'Cancel and choose another file',
       shareHint: 'Scan or share the link',
       copyBtn: 'Copy',
+      copyLinkAriaLabel: 'Copy link',
+      copyCodeAriaLabel: 'Copy code',
+      codeOnlyHint: 'Or just the code:',
       copiedFlash: 'Copied',
       waitingRecipient: 'waiting for recipient',
       senderDefaultStatus: 'Choosing a file generates a one-time link and QR code.',
@@ -786,7 +798,7 @@
       helpTitle: 'Help',
       closeHelpAriaLabel: 'Close help',
       helpSendHeading: 'Sending a file',
-      helpSendBody: "Choose or drop a file. A one-time link and QR code are generated — share it with whoever's receiving it, however you like.",
+      helpSendBody: "Choose or drop a file. A one-time link and QR code are generated — share it with whoever's receiving it, however you like. Below the link there's a field with just the code, handier to copy or read out on small screens.",
       helpReceiveHeading: 'Receiving a file',
       helpReceiveBody: "Open the link (or scan the QR code) and the download starts on its own. If the file is large and your browser supports it, it'll first ask where to save it. If you don't have the link handy, on the main screen you can type the code or scan the QR with the dedicated button.",
       helpNotesHeading: 'Good to know',
@@ -1338,6 +1350,8 @@
     const qrChip = document.getElementById('qrChip');
     const linkInput = document.getElementById('linkInput');
     const copyBtn = document.getElementById('copyBtn');
+    const codeOnlyInput = document.getElementById('codeOnlyInput');
+    const copyCodeBtn = document.getElementById('copyCodeBtn');
     const sendProgressWrap = document.getElementById('sendProgressWrap');
     const sendFill = document.getElementById('sendFill');
     const sendPct = document.getElementById('sendPct');
@@ -1431,6 +1445,7 @@
       peer.on('open', (id) => {
         const url = location.origin + location.pathname + '#r=' + id;
         linkInput.value = url;
+        codeOnlyInput.value = id;
         shareRow.classList.add('show');
         qrChip.innerHTML = '';
         new QRCode(qrChip, {
@@ -1559,6 +1574,13 @@
       navigator.clipboard.writeText(linkInput.value).then(() => {
         copyBtn.textContent = t('copiedFlash');
         setTimeout(() => { copyBtn.textContent = t('copyBtn'); }, 1500);
+      });
+    });
+
+    copyCodeBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(codeOnlyInput.value).then(() => {
+        copyCodeBtn.textContent = t('copiedFlash');
+        setTimeout(() => { copyCodeBtn.textContent = t('copyBtn'); }, 1500);
       });
     });
   }
