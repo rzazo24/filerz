@@ -7,6 +7,14 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-24
+
+### Added
+- Interfaz bilingüe (español/inglés): detecta el idioma del navegador al cargar, con un botón ES/EN en el encabezado para cambiarlo manualmente; la preferencia se guarda en `localStorage`. Todos los textos de la interfaz (estáticos y de estado, incluido el modal de ayuda) pasan por un pequeño sistema de traducción (`I18N`/`t()`) en vez de estar escritos directo en el código.
+
+### Changed
+- Los mensajes de error que el emisor manda al receptor por el canal de datos (enlace ya usado, transferencia en curso) ahora viajan como códigos en vez de texto ya traducido, para que cada lado los muestre en su propio idioma sin depender del idioma del otro extremo.
+
 ## [0.7.0] - 2026-09-24
 
 ### Added
@@ -97,7 +105,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/rzazo24/filerz/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/rzazo24/filerz/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/rzazo24/filerz/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/rzazo24/filerz/compare/v0.5.0...v0.6.0

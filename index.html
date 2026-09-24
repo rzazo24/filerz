@@ -3,11 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Filerz — transferencia directa de archivos</title>
+<title data-i18n="pageTitle">Filerz — transferencia directa de archivos</title>
 <script>
   try {
     if (localStorage.getItem('filerz-theme') === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
+    }
+    var savedLang = localStorage.getItem('filerz-lang');
+    if (savedLang === 'en' || savedLang === 'es') {
+      document.documentElement.setAttribute('lang', savedLang);
     }
   } catch (e) {}
 </script>
@@ -120,15 +124,16 @@
     align-items: center;
     gap: 8px;
   }
-  button.theme-toggle, button.help-toggle {
+  button.theme-toggle, button.help-toggle, button.lang-toggle {
     font-size: 14px;
     padding: 6px 9px;
     background: var(--surface-2);
     color: var(--text);
     box-shadow: none;
   }
-  button.theme-toggle:hover, button.help-toggle:hover { background: var(--accent-soft); }
-  button.theme-toggle:active, button.help-toggle:active { transform: translate(1px, 1px); }
+  button.theme-toggle:hover, button.help-toggle:hover, button.lang-toggle:hover { background: var(--accent-soft); }
+  button.theme-toggle:active, button.help-toggle:active, button.lang-toggle:active { transform: translate(1px, 1px); }
+  button.lang-toggle { font-family: 'Press Start 2P', monospace; font-size: 9px; }
 
   .dot {
     width: 8px; height: 8px;
@@ -429,7 +434,8 @@
     .progress-speed { font-size: 14px; }
     .status { font-size: 17px; }
     .footer-note { font-size: 15px; }
-    button.theme-toggle, button.help-toggle { font-size: 16px; padding: 7px 10px; }
+    button.theme-toggle, button.help-toggle, button.lang-toggle { font-size: 16px; padding: 7px 10px; }
+    button.lang-toggle { font-size: 11px; }
     .cancel-btn { font-size: 13px; padding: 7px 10px; }
     .update-toast { font-size: 15px; bottom: 12px; }
     .update-toast button { font-size: 11px; }
@@ -445,16 +451,17 @@
   <div class="top">
     <h1>Filerz</h1>
     <div class="top-actions">
-      <button type="button" class="help-toggle" id="helpToggle" aria-label="Ayuda">?</button>
+      <button type="button" class="help-toggle" id="helpToggle" aria-label="Ayuda" data-i18n-label="helpAriaLabel">?</button>
+      <button type="button" class="lang-toggle" id="langToggle" aria-label="Switch to English">EN</button>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar a modo claro">☾</button>
-      <div class="pill"><span class="dot" id="statusDot"></span><span id="statusLabel">listo</span></div>
+      <div class="pill"><span class="dot" id="statusDot"></span><span id="statusLabel" data-i18n="statusReady">listo</span></div>
     </div>
   </div>
 
   <div id="senderView">
-    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Elegir un archivo para enviar">
-      <p>Suelta un archivo aquí o toca para elegirlo</p>
-      <small>Viaja directo al otro navegador, sin pasar por ningún servidor</small>
+    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Elegir un archivo para enviar" data-i18n-label="dropAriaLabel">
+      <p data-i18n="dropTitle">Suelta un archivo aquí o toca para elegirlo</p>
+      <small data-i18n="dropSubtitle">Viaja directo al otro navegador, sin pasar por ningún servidor</small>
     </div>
     <input type="file" id="fileInput">
 
@@ -464,80 +471,80 @@
         <div class="file-name" id="fileName"></div>
         <div class="file-meta" id="fileMeta"></div>
       </div>
-      <button type="button" class="cancel-btn" id="cancelBtn" aria-label="Cancelar y elegir otro archivo">✕</button>
+      <button type="button" class="cancel-btn" id="cancelBtn" aria-label="Cancelar y elegir otro archivo" data-i18n-label="cancelAriaLabel">✕</button>
     </div>
 
     <div class="share" id="shareRow">
       <div class="qr-chip" id="qrChip"></div>
       <div class="share-right">
-        <p>Escanea o comparte el enlace</p>
+        <p data-i18n="shareHint">Escanea o comparte el enlace</p>
         <div class="link-row">
           <input class="link-input" id="linkInput" readonly>
-          <button id="copyBtn">Copiar</button>
+          <button id="copyBtn" data-i18n="copyBtn">Copiar</button>
         </div>
       </div>
     </div>
 
     <div class="progress-wrap" id="sendProgressWrap">
       <div class="progress-track"><div class="progress-fill" id="sendFill"></div></div>
-      <div class="progress-label"><span id="sendPct">0%</span><span id="sendState">esperando destinatario</span></div>
+      <div class="progress-label"><span id="sendPct">0%</span><span id="sendState" data-i18n="waitingRecipient">esperando destinatario</span></div>
       <div class="progress-speed" id="sendSpeed"></div>
     </div>
 
-    <div class="status" id="senderStatus">Al elegir un archivo se generará un enlace y un código QR de un solo uso.</div>
+    <div class="status" id="senderStatus" data-i18n="senderDefaultStatus">Al elegir un archivo se generará un enlace y un código QR de un solo uso.</div>
   </div>
 
   <div id="receiverView" style="display:none">
     <div class="file-card" id="recvFileCard">
       <div class="file-glyph" id="recvGlyph">·</div>
       <div class="file-info">
-        <div class="file-name" id="recvFileName">Conectando…</div>
+        <div class="file-name" id="recvFileName" data-i18n="connectingEllipsis">Conectando…</div>
         <div class="file-meta" id="recvFileMeta"></div>
       </div>
     </div>
-    <button type="button" class="full" id="saveAsBtn" style="display:none; margin-top:14px;">Guardar como…</button>
+    <button type="button" class="full" id="saveAsBtn" style="display:none; margin-top:14px;" data-i18n="saveAsLabel">Guardar como…</button>
     <div class="progress-wrap show">
       <div class="progress-track"><div class="progress-fill" id="recvFill"></div></div>
-      <div class="progress-label"><span id="recvPct">0%</span><span id="recvState">esperando datos</span></div>
+      <div class="progress-label"><span id="recvPct">0%</span><span id="recvState" data-i18n="waitingData">esperando datos</span></div>
       <div class="progress-speed" id="recvSpeed"></div>
     </div>
     <a class="download-btn" id="downloadBtn" style="display:none; margin-top:16px;">
-      <button class="full">Descargar archivo</button>
+      <button class="full" data-i18n="downloadBtn">Descargar archivo</button>
     </a>
     <div class="status" id="receiverStatus"></div>
   </div>
 
-  <div class="footer-note">
+  <div class="footer-note" data-i18n="footerNote">
     Transferencia directa entre navegadores (WebRTC). Ambas pestañas deben permanecer abiertas mientras dura la copia.
   </div>
 </div>
 
 <div class="update-toast" id="updateToast" role="status">
-  <span>Hay una nueva versión disponible.</span>
+  <span data-i18n="updateAvailable">Hay una nueva versión disponible.</span>
   <div class="update-toast-actions">
-    <button type="button" class="update-dismiss" id="updateDismissBtn">Ahora no</button>
-    <button type="button" id="updateReloadBtn">Recargar</button>
+    <button type="button" class="update-dismiss" id="updateDismissBtn" data-i18n="updateDismiss">Ahora no</button>
+    <button type="button" id="updateReloadBtn" data-i18n="updateReload">Recargar</button>
   </div>
 </div>
 
 <div class="modal-overlay" id="helpOverlay">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <div class="modal-head">
-      <h2 id="helpTitle">Ayuda</h2>
-      <button type="button" class="modal-close" id="helpCloseBtn" aria-label="Cerrar ayuda">✕</button>
+      <h2 id="helpTitle" data-i18n="helpTitle">Ayuda</h2>
+      <button type="button" class="modal-close" id="helpCloseBtn" aria-label="Cerrar ayuda" data-i18n-label="closeHelpAriaLabel">✕</button>
     </div>
     <div class="modal-body">
-      <h3>Enviar un archivo</h3>
-      <p>Elige o suelta un archivo. Se genera un enlace y un código QR de un solo uso: compártelo con quien vaya a recibirlo, por el medio que prefieras.</p>
-      <h3>Recibir un archivo</h3>
-      <p>Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo.</p>
-      <h3>A tener en cuenta</h3>
+      <h3 data-i18n="helpSendHeading">Enviar un archivo</h3>
+      <p data-i18n="helpSendBody">Elige o suelta un archivo. Se genera un enlace y un código QR de un solo uso: compártelo con quien vaya a recibirlo, por el medio que prefieras.</p>
+      <h3 data-i18n="helpReceiveHeading">Recibir un archivo</h3>
+      <p data-i18n="helpReceiveBody">Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo.</p>
+      <h3 data-i18n="helpNotesHeading">A tener en cuenta</h3>
       <ul>
-        <li>El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.</li>
-        <li>Ambas pestañas deben quedar abiertas mientras dura la copia.</li>
-        <li>El enlace es de un solo uso: una vez completada la transferencia, deja de funcionar.</li>
+        <li data-i18n="helpNote1">El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.</li>
+        <li data-i18n="helpNote2">Ambas pestañas deben quedar abiertas mientras dura la copia.</li>
+        <li data-i18n="helpNote3">El enlace es de un solo uso: una vez completada la transferencia, deja de funcionar.</li>
       </ul>
-      <p class="modal-repo">Código abierto (MIT): <a href="https://github.com/rzazo24/filerz" target="_blank" rel="noopener noreferrer">github.com/rzazo24/filerz</a></p>
+      <p class="modal-repo"><span data-i18n="helpRepoLabel">Código abierto (MIT):</span> <a href="https://github.com/rzazo24/filerz" target="_blank" rel="noopener noreferrer">github.com/rzazo24/filerz</a></p>
     </div>
   </div>
 </div>
@@ -549,6 +556,199 @@
   const supportsFsAccess = 'showSaveFilePicker' in window;
   const params = new URLSearchParams(location.hash.slice(1));
   const receiveId = params.get('r');
+
+  const I18N = {
+    es: {
+      pageTitle: 'Filerz — transferencia directa de archivos',
+      helpAriaLabel: 'Ayuda',
+      dropAriaLabel: 'Elegir un archivo para enviar',
+      dropTitle: 'Suelta un archivo aquí o toca para elegirlo',
+      dropSubtitle: 'Viaja directo al otro navegador, sin pasar por ningún servidor',
+      cancelAriaLabel: 'Cancelar y elegir otro archivo',
+      shareHint: 'Escanea o comparte el enlace',
+      copyBtn: 'Copiar',
+      copiedFlash: 'Copiado',
+      waitingRecipient: 'esperando destinatario',
+      senderDefaultStatus: 'Al elegir un archivo se generará un enlace y un código QR de un solo uso.',
+      connectingEllipsis: 'Conectando…',
+      saveAsLabel: 'Guardar como…',
+      waitingData: 'esperando datos',
+      downloadBtn: 'Descargar archivo',
+      footerNote: 'Transferencia directa entre navegadores (WebRTC). Ambas pestañas deben permanecer abiertas mientras dura la copia.',
+      updateAvailable: 'Hay una nueva versión disponible.',
+      updateDismiss: 'Ahora no',
+      updateReload: 'Recargar',
+      helpTitle: 'Ayuda',
+      closeHelpAriaLabel: 'Cerrar ayuda',
+      helpSendHeading: 'Enviar un archivo',
+      helpSendBody: 'Elige o suelta un archivo. Se genera un enlace y un código QR de un solo uso: compártelo con quien vaya a recibirlo, por el medio que prefieras.',
+      helpReceiveHeading: 'Recibir un archivo',
+      helpReceiveBody: 'Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo.',
+      helpNotesHeading: 'A tener en cuenta',
+      helpNote1: 'El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.',
+      helpNote2: 'Ambas pestañas deben quedar abiertas mientras dura la copia.',
+      helpNote3: 'El enlace es de un solo uso: una vez completada la transferencia, deja de funcionar.',
+      helpRepoLabel: 'Código abierto (MIT):',
+      statusReady: 'listo',
+      connecting: 'conectando',
+      connected: 'conectado',
+      preparing: 'preparando',
+      waiting: 'esperando',
+      errorWord: 'error',
+      completed: 'completado',
+      completeWord: 'completo',
+      finished: 'terminado',
+      disconnected: 'desconectado',
+      cancelled: 'cancelado',
+      sending: 'enviando',
+      receiving: 'recibiendo',
+      recipientConnected: 'destinatario conectado',
+      recipientDisconnected: 'destinatario desconectado',
+      receiverConnectedWaiting: 'Conectado. Esperando que empiece el envío…',
+      largeFilePrompt: 'Archivo grande: elige dónde guardarlo para empezar (se escribe directo a disco, sin ocupar memoria del navegador).',
+      receivingToDisk: 'Recibiendo y guardando en disco…',
+      pickLocationFailed: 'No se pudo elegir la ubicación: {message}',
+      diskWriteError: 'Error al escribir en disco: {message}',
+      fileSavedOk: 'Archivo guardado correctamente.',
+      fileSaveError: 'Error al guardar el archivo: {message}',
+      fileReceivedOk: 'Archivo recibido completo.',
+      senderCancelled: 'El emisor canceló el envío.',
+      linkAlreadyUsed: 'Este enlace ya fue usado.',
+      transferInProgress: 'Ya hay una transferencia en curso con este enlace.',
+      linkUnavailable: 'Este enlace ya no está disponible.',
+      lostConnectionToSender: 'Se perdió la conexión con el emisor.',
+      connectionError: 'Error de conexión: {err}',
+      couldNotConnect: 'No se pudo conectar ({type}). El enlace puede haber caducado.',
+      transferCancelled: 'Transferencia cancelada.',
+      fileProtocolWarning: 'Este archivo se abrió directo desde el disco (file://), así que el enlace generado no funcionaría en otro dispositivo. Sírvelo desde un servidor http/https (por ejemplo, desplegado en Vercel) y vuelve a intentarlo.',
+      creatingLink: 'Creando enlace…',
+      shareLinkPrompt: 'Comparte el enlace o el QR. En cuanto se abra, empezará la copia.',
+      recipientDisconnectedRetry: 'El destinatario se desconectó antes de terminar. Puedes compartir el mismo enlace para reintentar.',
+      senderError: 'Error: {type}',
+      deliveryComplete: 'Entrega completa.',
+      etaSuffix: ' restante',
+      themeToLight: 'Cambiar a modo claro',
+      themeToDark: 'Cambiar a modo oscuro',
+      langToEnglish: 'Switch to English',
+      langToSpanish: 'Cambiar a español'
+    },
+    en: {
+      pageTitle: 'Filerz — direct file transfer',
+      helpAriaLabel: 'Help',
+      dropAriaLabel: 'Choose a file to send',
+      dropTitle: 'Drop a file here or tap to choose one',
+      dropSubtitle: 'Goes straight to the other browser, no server in between',
+      cancelAriaLabel: 'Cancel and choose another file',
+      shareHint: 'Scan or share the link',
+      copyBtn: 'Copy',
+      copiedFlash: 'Copied',
+      waitingRecipient: 'waiting for recipient',
+      senderDefaultStatus: 'Choosing a file generates a one-time link and QR code.',
+      connectingEllipsis: 'Connecting…',
+      saveAsLabel: 'Save as…',
+      waitingData: 'waiting for data',
+      downloadBtn: 'Download file',
+      footerNote: 'Direct transfer between browsers (WebRTC). Both tabs need to stay open while the copy is in progress.',
+      updateAvailable: 'A new version is available.',
+      updateDismiss: 'Not now',
+      updateReload: 'Reload',
+      helpTitle: 'Help',
+      closeHelpAriaLabel: 'Close help',
+      helpSendHeading: 'Sending a file',
+      helpSendBody: "Choose or drop a file. A one-time link and QR code are generated — share it with whoever's receiving it, however you like.",
+      helpReceiveHeading: 'Receiving a file',
+      helpReceiveBody: "Open the link (or scan the QR code) and the download starts on its own. If the file is large and your browser supports it, it'll first ask where to save it.",
+      helpNotesHeading: 'Good to know',
+      helpNote1: 'The file travels directly between the two browsers over WebRTC: it never touches a server of ours.',
+      helpNote2: 'Both tabs need to stay open for the whole transfer.',
+      helpNote3: "The link is one-time use: once the transfer finishes, it stops working.",
+      helpRepoLabel: 'Open source (MIT):',
+      statusReady: 'ready',
+      connecting: 'connecting',
+      connected: 'connected',
+      preparing: 'preparing',
+      waiting: 'waiting',
+      errorWord: 'error',
+      completed: 'completed',
+      completeWord: 'complete',
+      finished: 'finished',
+      disconnected: 'disconnected',
+      cancelled: 'cancelled',
+      sending: 'sending',
+      receiving: 'receiving',
+      recipientConnected: 'recipient connected',
+      recipientDisconnected: 'recipient disconnected',
+      receiverConnectedWaiting: 'Connected. Waiting for the transfer to start…',
+      largeFilePrompt: "Large file: choose where to save it to begin (it writes straight to disk, without using browser memory).",
+      receivingToDisk: 'Receiving and saving to disk…',
+      pickLocationFailed: "Couldn't choose the location: {message}",
+      diskWriteError: 'Error writing to disk: {message}',
+      fileSavedOk: 'File saved successfully.',
+      fileSaveError: 'Error saving the file: {message}',
+      fileReceivedOk: 'File fully received.',
+      senderCancelled: 'The sender cancelled the transfer.',
+      linkAlreadyUsed: 'This link has already been used.',
+      transferInProgress: 'A transfer is already in progress on this link.',
+      linkUnavailable: 'This link is no longer available.',
+      lostConnectionToSender: 'Lost connection to the sender.',
+      connectionError: 'Connection error: {err}',
+      couldNotConnect: "Couldn't connect ({type}). The link may have expired.",
+      transferCancelled: 'Transfer cancelled.',
+      fileProtocolWarning: "This page was opened straight from disk (file://), so the generated link wouldn't work on another device. Serve it from an http/https server (for example, deployed on Vercel) and try again.",
+      creatingLink: 'Creating link…',
+      shareLinkPrompt: "Share the link or the QR code. As soon as it's opened, the transfer will start.",
+      recipientDisconnectedRetry: 'The recipient disconnected before finishing. You can share the same link to try again.',
+      senderError: 'Error: {type}',
+      deliveryComplete: 'Delivery complete.',
+      etaSuffix: ' left',
+      themeToLight: 'Switch to light mode',
+      themeToDark: 'Switch to dark mode',
+      langToEnglish: 'Switch to English',
+      langToSpanish: 'Switch to Spanish'
+    }
+  };
+
+  const LANG_STORAGE_KEY = 'filerz-lang';
+  let lang = 'es';
+  try {
+    const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
+    if (savedLang === 'en' || savedLang === 'es') {
+      lang = savedLang;
+    } else if ((navigator.language || '').toLowerCase().indexOf('en') === 0) {
+      lang = 'en';
+    }
+  } catch (e) {}
+
+  function t(key, vars) {
+    let str = (I18N[lang] && I18N[lang][key]) || I18N.es[key] || key;
+    if (vars) {
+      Object.keys(vars).forEach((k) => {
+        str = str.replace('{' + k + '}', vars[k]);
+      });
+    }
+    return str;
+  }
+
+  const keyedEls = new Set();
+  function setKeyedText(el, key, vars) {
+    el.textContent = t(key, vars);
+    el._i18nKey = key;
+    el._i18nVars = vars;
+    keyedEls.add(el);
+  }
+  function applyStaticTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-label]').forEach((el) => {
+      el.setAttribute('aria-label', t(el.getAttribute('data-i18n-label')));
+    });
+  }
+  function retranslateKeyed() {
+    keyedEls.forEach((el) => {
+      el.textContent = t(el._i18nKey, el._i18nVars);
+    });
+  }
 
   const statusDot = document.getElementById('statusDot');
   const statusLabel = document.getElementById('statusLabel');
@@ -564,9 +764,9 @@
     const ext = (name.split('.').pop() || '').slice(0, 3).toUpperCase();
     return ext || '·';
   }
-  function setLive(on, label) {
+  function setLive(on, key) {
     statusDot.classList.toggle('live', !!on);
-    statusLabel.textContent = label;
+    setKeyedText(statusLabel, key);
   }
   function formatDuration(seconds) {
     if (!isFinite(seconds) || seconds < 0) return '';
@@ -588,7 +788,7 @@
       } else if (elapsed > 0) {
         const bytesPerSec = windowBytes / elapsed;
         const eta = bytesPerSec > 0 ? (total - doneBytes) / bytesPerSec : Infinity;
-        el.textContent = fmtBytes(bytesPerSec) + '/s · ' + formatDuration(eta) + ' restante';
+        el.textContent = fmtBytes(bytesPerSec) + '/s · ' + formatDuration(eta) + t('etaSuffix');
       }
       windowStart = now;
       windowBytes = 0;
@@ -672,7 +872,7 @@
   function syncThemeToggle() {
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     themeToggle.textContent = isLight ? '☀' : '☾';
-    themeToggle.setAttribute('aria-label', isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+    themeToggle.setAttribute('aria-label', isLight ? t('themeToDark') : t('themeToLight'));
     themeColorMeta.setAttribute('content', isLight ? '#f4ecff' : '#0a0612');
   }
   syncThemeToggle();
@@ -687,11 +887,31 @@
     syncThemeToggle();
   });
 
+  const langToggle = document.getElementById('langToggle');
+  function syncLangToggle() {
+    langToggle.textContent = lang === 'es' ? 'EN' : 'ES';
+    langToggle.setAttribute('aria-label', lang === 'es' ? t('langToEnglish') : t('langToSpanish'));
+    document.documentElement.setAttribute('lang', lang);
+    document.title = t('pageTitle');
+  }
+  function renderLang() {
+    syncLangToggle();
+    syncThemeToggle();
+    applyStaticTranslations();
+    retranslateKeyed();
+  }
+  renderLang();
+  langToggle.addEventListener('click', () => {
+    lang = lang === 'es' ? 'en' : 'es';
+    try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch (e) {}
+    renderLang();
+  });
+
   if (receiveId) {
     // ---------- RECEIVER ----------
     senderView.style.display = 'none';
     receiverView.style.display = 'block';
-    setLive(false, 'conectando');
+    setLive(false, 'connecting');
 
     const recvGlyph = document.getElementById('recvGlyph');
     const recvFileName = document.getElementById('recvFileName');
@@ -723,8 +943,8 @@
     peer.on('open', () => {
       const conn = peer.connect(receiveId, { reliable: true });
       conn.on('open', () => {
-        setLive(true, 'conectado');
-        receiverStatus.textContent = 'Conectado. Esperando que empiece el envío…';
+        setLive(true, 'connected');
+        setKeyedText(receiverStatus, 'receiverConnectedWaiting');
       });
       conn.on('data', (msg) => {
         if (msg && msg.type === 'meta') {
@@ -736,8 +956,8 @@
 
           const useStreaming = supportsFsAccess && meta.size > STREAM_TO_DISK_THRESHOLD;
           if (useStreaming) {
-            recvState.textContent = 'esperando';
-            receiverStatus.textContent = 'Archivo grande: elige dónde guardarlo para empezar (se escribe directo a disco, sin ocupar memoria del navegador).';
+            setKeyedText(recvState, 'waiting');
+            setKeyedText(receiverStatus, 'largeFilePrompt');
             saveAsBtn.style.display = 'block';
             saveAsBtn.onclick = async () => {
               saveAsBtn.disabled = true;
@@ -746,21 +966,21 @@
                 writableStream = await handle.createWritable();
                 saveAsBtn.style.display = 'none';
                 transferInProgress = true;
-                recvState.textContent = 'recibiendo';
-                receiverStatus.textContent = 'Recibiendo y guardando en disco…';
+                setKeyedText(recvState, 'receiving');
+                setKeyedText(receiverStatus, 'receivingToDisk');
                 receiverStatus.className = 'status';
                 conn.send({ type: 'ready' });
               } catch (err) {
                 saveAsBtn.disabled = false;
                 if (err && err.name !== 'AbortError') {
-                  receiverStatus.textContent = 'No se pudo elegir la ubicación: ' + err.message;
+                  setKeyedText(receiverStatus, 'pickLocationFailed', { message: err.message });
                   receiverStatus.className = 'status error';
                 }
               }
             };
           } else {
             transferInProgress = true;
-            recvState.textContent = 'recibiendo';
+            setKeyedText(recvState, 'receiving');
             conn.send({ type: 'ready' });
           }
         } else if (msg && msg.type === 'chunk') {
@@ -768,7 +988,7 @@
           receivedBytes += buf.byteLength;
           if (writableStream) {
             writableStream.write(buf).catch((err) => {
-              receiverStatus.textContent = 'Error al escribir en disco: ' + err.message;
+              setKeyedText(receiverStatus, 'diskWriteError', { message: err.message });
               receiverStatus.className = 'status error';
             });
           } else {
@@ -781,15 +1001,15 @@
         } else if (msg && msg.type === 'done') {
           finished = true;
           transferInProgress = false;
-          recvState.textContent = 'completo';
+          setKeyedText(recvState, 'completeWord');
           recvSpeed.textContent = '';
-          setLive(true, 'terminado');
+          setLive(true, 'finished');
           if (writableStream) {
             writableStream.close().then(() => {
-              receiverStatus.textContent = 'Archivo guardado correctamente.';
+              setKeyedText(receiverStatus, 'fileSavedOk');
               receiverStatus.className = 'status ready';
             }).catch((err) => {
-              receiverStatus.textContent = 'Error al guardar el archivo: ' + err.message;
+              setKeyedText(receiverStatus, 'fileSaveError', { message: err.message });
               receiverStatus.className = 'status error';
             });
           } else {
@@ -798,22 +1018,22 @@
             downloadBtn.href = url;
             downloadBtn.download = meta.name;
             downloadBtn.style.display = 'block';
-            receiverStatus.textContent = 'Archivo recibido completo.';
+            setKeyedText(receiverStatus, 'fileReceivedOk');
             receiverStatus.className = 'status ready';
           }
         } else if (msg && msg.type === 'cancel') {
           stoppedWithMessage = true;
           transferInProgress = false;
-          recvState.textContent = 'cancelado';
-          setLive(false, 'cancelado');
-          receiverStatus.textContent = 'El emisor canceló el envío.';
+          setKeyedText(recvState, 'cancelled');
+          setLive(false, 'cancelled');
+          setKeyedText(receiverStatus, 'senderCancelled');
           receiverStatus.className = 'status error';
           abortWritable();
         } else if (msg && msg.type === 'error') {
           stoppedWithMessage = true;
           transferInProgress = false;
-          setLive(false, 'error');
-          receiverStatus.textContent = msg.message || 'Este enlace ya no está disponible.';
+          setLive(false, 'errorWord');
+          setKeyedText(receiverStatus, msg.code || 'linkUnavailable');
           receiverStatus.className = 'status error';
           abortWritable();
         }
@@ -821,20 +1041,20 @@
       conn.on('close', () => {
         if (finished || stoppedWithMessage) return;
         transferInProgress = false;
-        recvState.textContent = 'desconectado';
-        setLive(false, 'desconectado');
-        receiverStatus.textContent = 'Se perdió la conexión con el emisor.';
+        setKeyedText(recvState, 'disconnected');
+        setLive(false, 'disconnected');
+        setKeyedText(receiverStatus, 'lostConnectionToSender');
         receiverStatus.className = 'status error';
         abortWritable();
       });
       conn.on('error', (err) => {
-        receiverStatus.textContent = 'Error de conexión: ' + err;
+        setKeyedText(receiverStatus, 'connectionError', { err: err });
         receiverStatus.className = 'status error';
       });
     });
     peer.on('error', (err) => {
-      setLive(false, 'error');
-      receiverStatus.textContent = 'No se pudo conectar (' + err.type + '). El enlace puede haber caducado.';
+      setLive(false, 'errorWord');
+      setKeyedText(receiverStatus, 'couldNotConnect', { type: err.type });
       receiverStatus.className = 'status error';
     });
 
@@ -890,18 +1110,18 @@
       transferInProgress = false;
     }
 
-    function resetSenderUI(message) {
+    function resetSenderUI(statusKey) {
       selectedFile = null;
       fileCard.classList.remove('show');
       shareRow.classList.remove('show');
       sendProgressWrap.classList.remove('show');
       sendFill.style.width = '0%';
       sendPct.textContent = '0%';
-      sendState.textContent = 'esperando destinatario';
+      setKeyedText(sendState, 'waitingRecipient');
       sendSpeed.textContent = '';
       fileInput.value = '';
-      setLive(false, 'listo');
-      senderStatus.textContent = message;
+      setLive(false, 'ready');
+      setKeyedText(senderStatus, statusKey);
       senderStatus.className = 'status';
     }
 
@@ -910,12 +1130,12 @@
         try { activeConn.send({ type: 'cancel' }); } catch (e) {}
       }
       teardownPeer();
-      resetSenderUI('Transferencia cancelada.');
+      resetSenderUI('transferCancelled');
     });
 
     function handleFile(file) {
       if (location.protocol === 'file:') {
-        senderStatus.textContent = 'Este archivo se abrió directo desde el disco (file://), así que el enlace generado no funcionaría en otro dispositivo. Sírvelo desde un servidor http/https (por ejemplo, desplegado en Vercel) y vuelve a intentarlo.';
+        setKeyedText(senderStatus, 'fileProtocolWarning');
         senderStatus.className = 'status error';
         return;
       }
@@ -926,8 +1146,8 @@
       fileGlyph.textContent = extGlyph(file.name);
       fileName.textContent = file.name;
       fileMeta.textContent = fmtBytes(file.size);
-      senderStatus.textContent = 'Creando enlace…';
-      setLive(false, 'preparando');
+      setKeyedText(senderStatus, 'creatingLink');
+      setLive(false, 'preparing');
 
       peer = new Peer();
 
@@ -944,21 +1164,21 @@
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         });
-        setLive(true, 'esperando');
-        senderStatus.textContent = 'Comparte el enlace o el QR. En cuanto se abra, empezará la copia.';
+        setLive(true, 'waiting');
+        setKeyedText(senderStatus, 'shareLinkPrompt');
       });
 
       peer.on('connection', (conn) => {
         if (finished) {
           conn.on('open', () => {
-            conn.send({ type: 'error', message: 'Este enlace ya fue usado.' });
+            conn.send({ type: 'error', code: 'linkAlreadyUsed' });
             conn.close();
           });
           return;
         }
         if (activeConn) {
           conn.on('open', () => {
-            conn.send({ type: 'error', message: 'Ya hay una transferencia en curso con este enlace.' });
+            conn.send({ type: 'error', code: 'transferInProgress' });
             conn.close();
           });
           return;
@@ -968,7 +1188,7 @@
         transferInProgress = true;
         let sendStarted = false;
         sendProgressWrap.classList.add('show');
-        sendState.textContent = 'destinatario conectado';
+        setKeyedText(sendState, 'recipientConnected');
 
         conn.on('open', () => {
           conn.send({ type: 'meta', name: selectedFile.name, size: selectedFile.size, mime: selectedFile.type });
@@ -985,16 +1205,16 @@
           if (finished || cancelledBySender) return;
           activeConn = null;
           transferInProgress = false;
-          sendState.textContent = 'destinatario desconectado';
-          senderStatus.textContent = 'El destinatario se desconectó antes de terminar. Puedes compartir el mismo enlace para reintentar.';
+          setKeyedText(sendState, 'recipientDisconnected');
+          setKeyedText(senderStatus, 'recipientDisconnectedRetry');
           senderStatus.className = 'status error';
-          setLive(false, 'desconectado');
+          setLive(false, 'disconnected');
         });
       });
 
       peer.on('error', (err) => {
-        setLive(false, 'error');
-        senderStatus.textContent = 'Error: ' + err.type;
+        setLive(false, 'errorWord');
+        setKeyedText(senderStatus, 'senderError', { type: err.type });
         senderStatus.className = 'status error';
       });
     }
@@ -1032,7 +1252,7 @@
           const pct = Math.min(100, Math.round((offset / file.size) * 100));
           sendFill.style.width = pct + '%';
           sendPct.textContent = pct + '%';
-          sendState.textContent = 'enviando';
+          setKeyedText(sendState, 'sending');
           trackSendSpeed(chunk.byteLength, offset, file.size);
 
           if (offset < file.size) {
@@ -1041,9 +1261,9 @@
             conn.send({ type: 'done' });
             finished = true;
             transferInProgress = false;
-            sendState.textContent = 'completado';
-            setLive(true, 'completado');
-            senderStatus.textContent = 'Entrega completa.';
+            setKeyedText(sendState, 'completed');
+            setLive(true, 'completed');
+            setKeyedText(senderStatus, 'deliveryComplete');
             senderStatus.className = 'status ready';
           }
         });
@@ -1054,8 +1274,8 @@
 
     copyBtn.addEventListener('click', () => {
       navigator.clipboard.writeText(linkInput.value).then(() => {
-        copyBtn.textContent = 'Copiado';
-        setTimeout(() => { copyBtn.textContent = 'Copiar'; }, 1500);
+        copyBtn.textContent = t('copiedFlash');
+        setTimeout(() => { copyBtn.textContent = t('copyBtn'); }, 1500);
       });
     });
   }

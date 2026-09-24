@@ -12,6 +12,7 @@ Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizz
 - El archivo nunca pasa por un backend: viaja directo entre los dos navegadores por un `RTCDataChannel`.
 - Es una **PWA instalable**: se puede agregar a la pantalla de inicio (o instalar como app de escritorio) y la interfaz carga al instante gracias al service worker, incluso sin conexión.
 - Botón de **ayuda** (`?`) con instrucciones de uso y el link a este repositorio.
+- Interfaz en **español o inglés**: detecta el idioma del navegador al entrar y se puede cambiar con el botón ES/EN del encabezado (se recuerda en `localStorage`). Los mensajes de error que viajan entre emisor y receptor usan códigos, no texto ya traducido, así que cada lado ve la interfaz en su propio idioma sin importar el del otro.
 
 ## Cómo funciona
 
