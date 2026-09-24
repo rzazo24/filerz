@@ -1,7 +1,7 @@
 // Subir este número en cada deploy que cambie index.html, manifest.json o los
 // íconos: es lo único que hace que el navegador detecte una versión nueva del
 // service worker y dispare el aviso de "recargar para actualizar" en la app.
-const CACHE_NAME = 'filerz-shell-v4';
+const CACHE_NAME = 'filerz-shell-v5';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
