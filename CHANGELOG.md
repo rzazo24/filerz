@@ -7,6 +7,12 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-24
+
+### Added
+- Vercel Analytics (`/_vercel/insights/script.js`), sin necesidad de build ni paquetes npm. Requiere habilitar "Web Analytics" en el dashboard de Vercel para el proyecto; sin eso, el script no hace nada.
+- Botón de ayuda (`?`) en el encabezado que abre un modal con instrucciones de uso (enviar, recibir, cosas a tener en cuenta) y un link a este repositorio de GitHub.
+
 ## [0.6.1] - 2026-09-24
 
 ### Added
@@ -91,7 +97,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/rzazo24/filerz/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/rzazo24/filerz/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/rzazo24/filerz/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/rzazo24/filerz/compare/v0.4.0...v0.5.0
