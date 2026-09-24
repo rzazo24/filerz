@@ -388,6 +388,7 @@
         <div class="file-meta" id="recvFileMeta"></div>
       </div>
     </div>
+    <button type="button" class="full" id="saveAsBtn" style="display:none; margin-top:14px;">Guardar como…</button>
     <div class="progress-wrap show">
       <div class="progress-track"><div class="progress-fill" id="recvFill"></div></div>
       <div class="progress-label"><span id="recvPct">0%</span><span id="recvState">esperando datos</span></div>
@@ -407,6 +408,8 @@
 <script>
 (function () {
   const CHUNK_SIZE = 16 * 1024;
+  const STREAM_TO_DISK_THRESHOLD = 200 * 1024 * 1024; // por encima de esto, se prefiere escribir a disco en vez de acumular en RAM
+  const supportsFsAccess = 'showSaveFilePicker' in window;
   const params = new URLSearchParams(location.hash.slice(1));
   const receiveId = params.get('r');
 
@@ -496,6 +499,7 @@
     const downloadBtn = document.getElementById('downloadBtn');
     const receiverStatus = document.getElementById('receiverStatus');
     const recvSpeed = document.getElementById('recvSpeed');
+    const saveAsBtn = document.getElementById('saveAsBtn');
 
     let meta = null;
     let received = [];
@@ -503,6 +507,14 @@
     let finished = false;
     let stoppedWithMessage = false;
     let trackRecvSpeed = null;
+    let writableStream = null;
+
+    function abortWritable() {
+      if (writableStream) {
+        writableStream.abort().catch(() => {});
+        writableStream = null;
+      }
+    }
 
     const peer = new Peer();
     peer.on('open', () => {
@@ -515,15 +527,50 @@
         if (msg && msg.type === 'meta') {
           meta = msg;
           trackRecvSpeed = makeSpeedTracker(recvSpeed);
-          transferInProgress = true;
           recvGlyph.textContent = extGlyph(meta.name);
           recvFileName.textContent = meta.name;
           recvFileMeta.textContent = fmtBytes(meta.size);
-          recvState.textContent = 'recibiendo';
+
+          const useStreaming = supportsFsAccess && meta.size > STREAM_TO_DISK_THRESHOLD;
+          if (useStreaming) {
+            recvState.textContent = 'esperando';
+            receiverStatus.textContent = 'Archivo grande: elegí dónde guardarlo para empezar (se escribe directo a disco, sin ocupar memoria del navegador).';
+            saveAsBtn.style.display = 'block';
+            saveAsBtn.onclick = async () => {
+              saveAsBtn.disabled = true;
+              try {
+                const handle = await window.showSaveFilePicker({ suggestedName: meta.name });
+                writableStream = await handle.createWritable();
+                saveAsBtn.style.display = 'none';
+                transferInProgress = true;
+                recvState.textContent = 'recibiendo';
+                receiverStatus.textContent = 'Recibiendo y guardando en disco…';
+                receiverStatus.className = 'status';
+                conn.send({ type: 'ready' });
+              } catch (err) {
+                saveAsBtn.disabled = false;
+                if (err && err.name !== 'AbortError') {
+                  receiverStatus.textContent = 'No se pudo elegir la ubicación: ' + err.message;
+                  receiverStatus.className = 'status error';
+                }
+              }
+            };
+          } else {
+            transferInProgress = true;
+            recvState.textContent = 'recibiendo';
+            conn.send({ type: 'ready' });
+          }
         } else if (msg && msg.type === 'chunk') {
           const buf = msg.data;
-          received.push(buf);
           receivedBytes += buf.byteLength;
+          if (writableStream) {
+            writableStream.write(buf).catch((err) => {
+              receiverStatus.textContent = 'Error al escribir en disco: ' + err.message;
+              receiverStatus.className = 'status error';
+            });
+          } else {
+            received.push(buf);
+          }
           const pct = meta ? Math.min(100, Math.round((receivedBytes / meta.size) * 100)) : 0;
           recvFill.style.width = pct + '%';
           recvPct.textContent = pct + '%';
@@ -534,13 +581,23 @@
           recvState.textContent = 'completo';
           recvSpeed.textContent = '';
           setLive(true, 'terminado');
-          const blob = new Blob(received, { type: meta.mime || 'application/octet-stream' });
-          const url = URL.createObjectURL(blob);
-          downloadBtn.href = url;
-          downloadBtn.download = meta.name;
-          downloadBtn.style.display = 'block';
-          receiverStatus.textContent = 'Archivo recibido completo.';
-          receiverStatus.className = 'status ready';
+          if (writableStream) {
+            writableStream.close().then(() => {
+              receiverStatus.textContent = 'Archivo guardado correctamente.';
+              receiverStatus.className = 'status ready';
+            }).catch((err) => {
+              receiverStatus.textContent = 'Error al guardar el archivo: ' + err.message;
+              receiverStatus.className = 'status error';
+            });
+          } else {
+            const blob = new Blob(received, { type: meta.mime || 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            downloadBtn.href = url;
+            downloadBtn.download = meta.name;
+            downloadBtn.style.display = 'block';
+            receiverStatus.textContent = 'Archivo recibido completo.';
+            receiverStatus.className = 'status ready';
+          }
         } else if (msg && msg.type === 'cancel') {
           stoppedWithMessage = true;
           transferInProgress = false;
@@ -548,12 +605,14 @@
           setLive(false, 'cancelado');
           receiverStatus.textContent = 'El emisor canceló el envío.';
           receiverStatus.className = 'status error';
+          abortWritable();
         } else if (msg && msg.type === 'error') {
           stoppedWithMessage = true;
           transferInProgress = false;
           setLive(false, 'error');
           receiverStatus.textContent = msg.message || 'Este enlace ya no está disponible.';
           receiverStatus.className = 'status error';
+          abortWritable();
         }
       });
       conn.on('close', () => {
@@ -563,6 +622,7 @@
         setLive(false, 'desconectado');
         receiverStatus.textContent = 'Se perdió la conexión con el emisor.';
         receiverStatus.className = 'status error';
+        abortWritable();
       });
       conn.on('error', (err) => {
         receiverStatus.textContent = 'Error de conexión: ' + err;
@@ -703,12 +763,19 @@
 
         activeConn = conn;
         transferInProgress = true;
+        let sendStarted = false;
         sendProgressWrap.classList.add('show');
         sendState.textContent = 'destinatario conectado';
 
         conn.on('open', () => {
           conn.send({ type: 'meta', name: selectedFile.name, size: selectedFile.size, mime: selectedFile.type });
-          sendFileInChunks(conn, selectedFile);
+        });
+
+        conn.on('data', (msg) => {
+          if (msg && msg.type === 'ready' && !sendStarted) {
+            sendStarted = true;
+            sendFileInChunks(conn, selectedFile);
+          }
         });
 
         conn.on('close', () => {
