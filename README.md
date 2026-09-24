@@ -13,6 +13,7 @@ Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizz
 - El receptor abre el enlace (o escanea el QR) y la transferencia arranca sola. Si no tiene el enlace a mano, también puede escribir el código directamente en la página o escanear el QR con la cámara del dispositivo, sin salir a una app externa.
 - Barra de progreso en ambos lados, con **velocidad y tiempo restante estimado**, mientras dura la copia.
 - Botón para **cancelar** la transferencia en cualquier momento y elegir otro archivo. Si el receptor se desconecta a mitad de la copia, se puede reintentar compartiendo el mismo enlace: deja de funcionar recién cuando se completa con éxito.
+- Al completarse la transferencia aparece un botón **Recargar** en ambos lados: en el emisor vuelve a la pantalla de elegir archivo, y en el receptor limpia el enlace de la URL antes de recargar, para no reintentar conectarse a un enlace que ya se usó.
 - El archivo nunca pasa por un backend: viaja directo entre los dos navegadores por un `RTCDataChannel`.
 - **Tema claro/oscuro** con botón dedicado, y drop-zone accesible por teclado.
 - Es una **PWA instalable**: se puede agregar a la pantalla de inicio (o instalar como app de escritorio), la interfaz carga al instante gracias al service worker (incluso sin conexión), y avisa con un cartel cuando hay una versión nueva para recargarla.

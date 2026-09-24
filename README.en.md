@@ -13,6 +13,7 @@ Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file tra
 - The recipient opens the link (or scans the QR code) and the transfer starts on its own. Without the link handy, they can also type the code directly on the page or scan the QR with the device's camera, no external app needed.
 - A progress bar on both sides, with **transfer speed and estimated time left**, while the copy is running.
 - A **cancel** button to stop the transfer at any point and pick another file. If the recipient disconnects mid-transfer, you can retry by sharing the same link: it only stops working once the transfer actually completes.
+- Once the transfer finishes, a **Reload** button appears on both sides: on the sender it goes back to the file-picker screen, and on the recipient it clears the link from the URL before reloading, so it doesn't retry connecting to a link that's already been used.
 - The file never touches a backend: it travels directly between the two browsers over an `RTCDataChannel`.
 - **Light/dark theme** with a dedicated toggle, and a keyboard-accessible drop zone.
 - It's an **installable PWA**: you can add it to your home screen (or install it as a desktop app), the interface loads instantly thanks to the service worker (even offline), and it shows a banner to reload when a new version is available.
