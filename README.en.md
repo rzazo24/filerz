@@ -10,9 +10,11 @@ Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file tra
 
 - The sender picks a file and a **one-time link** + a **QR code** are generated.
 - The recipient opens the link (or scans the QR code) and the transfer starts on its own.
-- A progress bar on both sides while the copy is running.
+- A progress bar on both sides, with **transfer speed and estimated time left**, while the copy is running.
+- A **cancel** button to stop the transfer at any point and pick another file. If the recipient disconnects mid-transfer, you can retry by sharing the same link: it only stops working once the transfer actually completes.
 - The file never touches a backend: it travels directly between the two browsers over an `RTCDataChannel`.
-- It's an **installable PWA**: you can add it to your home screen (or install it as a desktop app), and the interface loads instantly thanks to the service worker, even offline.
+- **Light/dark theme** with a dedicated toggle, and a keyboard-accessible drop zone.
+- It's an **installable PWA**: you can add it to your home screen (or install it as a desktop app), the interface loads instantly thanks to the service worker (even offline), and it shows a banner to reload when a new version is available.
 - A **help** button (`?`) with usage instructions and a link to this repository.
 - Interface in **Spanish or English**: it detects the browser's language on load and can be switched with the ES/EN button in the header (remembered in `localStorage`). Error messages that travel between sender and recipient use codes, not pre-translated text, so each side sees the interface in its own language regardless of the other's.
 
