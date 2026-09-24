@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.10.4] - 2026-09-24
+
+### Documentation
+- README (ES/EN) y ayuda de la app actualizados para mencionar el botón "Recargar" al completarse la transferencia.
+
 ## [0.10.3] - 2026-09-24
 
 ### Added
