@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.8.4] - 2026-09-24
+
+### Fixed
+- Cuando el contenido de la tarjeta era más alto que la pantalla (por ejemplo, al elegir un archivo aparecen la tarjeta del archivo, el QR y el enlace, sumando más alto), el centrado vertical de la página empujaba la parte de arriba —título y botones del encabezado— por encima del borde superior, y esa parte quedaba inalcanzable con scroll (es una limitación general de centrar contenido que desborda en CSS). Se pasa a `align-items: safe center`, que centra igual cuando el contenido entra pero nunca lo empuja fuera del área con la que se puede hacer scroll cuando no entra.
+
 ## [0.8.3] - 2026-09-24
 
 ### Fixed
@@ -123,7 +128,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.3...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.4...HEAD
+[0.8.4]: https://github.com/rzazo24/filerz/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/rzazo24/filerz/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/rzazo24/filerz/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/rzazo24/filerz/compare/v0.8.0...v0.8.1
