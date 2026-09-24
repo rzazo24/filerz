@@ -591,6 +591,7 @@
     </div>
 
     <div class="status" id="senderStatus" data-i18n="senderDefaultStatus">Al elegir un archivo se generará un enlace y un código QR de un solo uso.</div>
+    <button type="button" class="full" id="senderReloadBtn" style="display:none; margin-top:16px;" data-i18n="updateReload">Recargar</button>
   </div>
 
   <div id="receiverView" style="display:none">
@@ -611,6 +612,7 @@
       <button class="full" data-i18n="downloadBtn">Descargar archivo</button>
     </a>
     <div class="status" id="receiverStatus"></div>
+    <button type="button" class="full" id="receiverReloadBtn" style="display:none; margin-top:16px;" data-i18n="updateReload">Recargar</button>
   </div>
 
   <div class="footer-note" data-i18n="footerNote">
@@ -1175,8 +1177,13 @@
     const recvState = document.getElementById('recvState');
     const downloadBtn = document.getElementById('downloadBtn');
     const receiverStatus = document.getElementById('receiverStatus');
+    const receiverReloadBtn = document.getElementById('receiverReloadBtn');
     const recvSpeed = document.getElementById('recvSpeed');
     const saveAsBtn = document.getElementById('saveAsBtn');
+
+    receiverReloadBtn.addEventListener('click', () => {
+      location.href = location.pathname + location.search; // limpia el #r= para no reintentar el mismo enlace ya usado
+    });
 
     let meta = null;
     let received = [];
@@ -1262,6 +1269,7 @@
             writableStream.close().then(() => {
               setKeyedText(receiverStatus, 'fileSavedOk');
               receiverStatus.className = 'status ready';
+              receiverReloadBtn.style.display = 'block';
             }).catch((err) => {
               setKeyedText(receiverStatus, 'fileSaveError', { message: err.message });
               receiverStatus.className = 'status error';
@@ -1274,6 +1282,7 @@
             downloadBtn.style.display = 'block';
             setKeyedText(receiverStatus, 'fileReceivedOk');
             receiverStatus.className = 'status ready';
+            receiverReloadBtn.style.display = 'block';
           }
         } else if (msg && msg.type === 'cancel') {
           stoppedWithMessage = true;
@@ -1332,6 +1341,9 @@
     const sendState = document.getElementById('sendState');
     const sendSpeed = document.getElementById('sendSpeed');
     const senderStatus = document.getElementById('senderStatus');
+    const senderReloadBtn = document.getElementById('senderReloadBtn');
+
+    senderReloadBtn.addEventListener('click', () => location.reload());
 
     let selectedFile = null;
     let peer = null;
@@ -1379,6 +1391,7 @@
       setLive(false, 'ready');
       setKeyedText(senderStatus, statusKey);
       senderStatus.className = 'status';
+      senderReloadBtn.style.display = 'none';
     }
 
     cancelBtn.addEventListener('click', () => {
@@ -1531,6 +1544,7 @@
             setLive(true, 'completed');
             setKeyedText(senderStatus, 'deliveryComplete');
             senderStatus.className = 'status ready';
+            senderReloadBtn.style.display = 'block';
           }
         });
       };

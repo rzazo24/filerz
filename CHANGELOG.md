@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.10.3] - 2026-09-24
+
+### Added
+- Botón "Recargar" al completarse la transferencia, en ambos lados. En el emisor recarga la página (vuelve a la pantalla de elegir archivo); en el receptor limpia el enlace de la URL antes de recargar, para no reintentar conectarse a un enlace que ya se usó.
+
 ## [0.10.2] - 2026-09-24
 
 ### Fixed
@@ -159,7 +164,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.10.2...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.10.3...HEAD
+[0.10.3]: https://github.com/rzazo24/filerz/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/rzazo24/filerz/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/rzazo24/filerz/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/rzazo24/filerz/compare/v0.9.1...v0.10.0
