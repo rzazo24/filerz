@@ -455,6 +455,11 @@
     });
 
     function handleFile(file) {
+      if (location.protocol === 'file:') {
+        senderStatus.textContent = 'Este archivo se abrió directo desde el disco (file://), así que el enlace generado no funcionaría en otro dispositivo. Sírvelo desde un servidor http/https (por ejemplo, desplegado en Vercel) y vuelve a intentarlo.';
+        senderStatus.className = 'status error';
+        return;
+      }
       selectedFile = file;
       fileCard.classList.add('show');
       fileGlyph.textContent = extGlyph(file.name);
