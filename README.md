@@ -36,11 +36,11 @@ python3 -m http.server 8080
 # o: npx serve
 ```
 
-Abrí `http://localhost:8080` en dos pestañas (o dos dispositivos en la misma red) para simular emisor y receptor.
+Abre `http://localhost:8080` en dos pestañas (o dos dispositivos en la misma red) para simular emisor y receptor.
 
 ## Desplegar
 
-Pensado para desplegarse como sitio estático en **Vercel**: no hace falta build command ni configuración adicional, basta con importar el repo. También podés usar el botón de arriba para clonarlo y desplegarlo directo.
+Pensado para desplegarse como sitio estático en **Vercel**: no hace falta build command ni configuración adicional, basta con importar el repo. También puedes usar el botón de arriba para clonarlo y desplegarlo directo.
 
 Para que **Vercel Analytics** empiece a recolectar datos, hay que habilitar "Web Analytics" para el proyecto desde el dashboard de Vercel (pestaña **Analytics** del proyecto). Sin ese paso, el script (`/_vercel/insights/script.js`) no hace nada.
 
