@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-09-24
+
+### Changed
+- El ID del enlace se separa en dos bloques de 4 caracteres con un guion (`abcd-1234`), para que sea más fácil de leer o tipear a mano, por ejemplo cuando no hay cámara para escanear el QR.
+
 ## [0.9.0] - 2026-09-24
 
 ### Changed
@@ -138,7 +143,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/rzazo24/filerz/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/rzazo24/filerz/compare/v0.8.5...v0.9.0
 [0.8.5]: https://github.com/rzazo24/filerz/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/rzazo24/filerz/compare/v0.8.3...v0.8.4

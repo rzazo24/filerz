@@ -23,7 +23,7 @@ Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file tra
 
 Everything lives in a single self-contained HTML file (`index.html`), with no build step or installed dependencies:
 
-- **[PeerJS](https://peerjs.com/)** wraps WebRTC and handles the initial signaling (the SDP/ICE exchange the two browsers need to find each other) using the public **PeerJS Cloud** broker. Once the connection is established, data no longer goes through that broker. Instead of the long UUID it assigns by default, a short 8-character ID is generated so the link stays short (with an automatic retry if it happens to collide with one already in use).
+- **[PeerJS](https://peerjs.com/)** wraps WebRTC and handles the initial signaling (the SDP/ICE exchange the two browsers need to find each other) using the public **PeerJS Cloud** broker. Once the connection is established, data no longer goes through that broker. Instead of the long UUID it assigns by default, a short 8-character ID split into two blocks (`abcd-1234`) is generated, so the link stays short and easy to read or type by hand (with an automatic retry if it happens to collide with one already in use).
 - **[qrcodejs](https://github.com/davidshimjs/qrcodejs)** generates the QR code with the session link.
 - The file is sent in 16 KB chunks over the data channel, with flow control so the outgoing buffer never gets flooded. For files over 200 MB in supporting browsers (desktop Chrome/Edge), the recipient writes straight to disk using the File System Access API; otherwise, chunks are reassembled in memory until the final `Blob` is ready to download.
 

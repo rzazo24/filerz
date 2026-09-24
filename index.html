@@ -796,6 +796,7 @@
   function generateShortId() {
     let id = '';
     for (let i = 0; i < 8; i++) {
+      if (i === 4) id += '-';
       id += SHORT_ID_ALPHABET[Math.floor(Math.random() * SHORT_ID_ALPHABET.length)];
     }
     return id;
