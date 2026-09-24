@@ -16,10 +16,10 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 ## [0.6.1] - 2026-09-24
 
 ### Added
-- Aviso de actualización disponible: cuando se publica una nueva versión, aparece un cartel para recargar la página y activarla al toque, en vez de que el service worker la aplique en silencio.
+- Aviso de actualización disponible: cuando se publica una nueva versión, aparece un cartel para recargar la página y activarla al instante, en vez de que el service worker la aplique en silencio.
 
 ### Fixed
-- El service worker ya no llama `skipWaiting()` automáticamente al instalar, así que una actualización no reemplaza la versión en uso hasta que el usuario confirme. El listener de `controllerchange` que dispara el reload se agrega recién al confirmar, para no recargar la página de forma espontánea la primera vez que el service worker toma control (`clients.claim()` también dispara ese evento en la instalación inicial).
+- El service worker ya no llama `skipWaiting()` automáticamente al instalar, así que una actualización no reemplaza la versión en uso hasta que el usuario confirme. El listener de `controllerchange` que dispara el reload se agrega solo al confirmar, para no recargar la página de forma espontánea la primera vez que el service worker toma control (`clients.claim()` también dispara ese evento en la instalación inicial).
 
 ## [0.6.0] - 2026-09-24
 
@@ -30,7 +30,7 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 ## [0.5.0] - 2026-09-24
 
 ### Added
-- Streaming directo a disco para archivos grandes (>200 MB) en navegadores compatibles con la File System Access API (Chrome/Edge de escritorio): el receptor elige dónde guardar antes de empezar y los datos se escriben en el archivo a medida que llegan, sin acumularse en memoria. En navegadores sin soporte (Firefox, Safari) o para archivos más chicos, sigue funcionando igual que antes (todo en memoria + botón de descarga al final).
+- Streaming directo a disco para archivos grandes (>200 MB) en navegadores compatibles con la File System Access API (Chrome/Edge de escritorio): el receptor elige dónde guardar antes de empezar y los datos se escriben en el archivo a medida que llegan, sin acumularse en memoria. En navegadores sin soporte (Firefox, Safari) o para archivos más pequeños, sigue funcionando igual que antes (todo en memoria + botón de descarga al final).
 - Protocolo de arranque `ready`: el emisor ahora espera una señal explícita del receptor antes de empezar a mandar datos, lo que permite al receptor prepararse (elegir dónde guardar) sin perder los primeros fragmentos.
 
 ## [0.4.0] - 2026-09-24
@@ -43,7 +43,7 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ### Fixed
 - El enlace de un solo uso ahora se invalida de verdad: una vez completada la entrega, cualquier intento posterior de abrirlo recibe un aviso de "enlace ya usado" en vez de reiniciar el envío desde cero o pisar la transferencia en curso.
-- Se detecta cuando el receptor se desconecta a mitad de la copia (antes quedaba "enviando" sin avisar); ahora se muestra un aviso y se puede reintentar compartiendo el mismo enlace, ya que el envío recién se bloquea tras completarse con éxito.
+- Se detecta cuando el receptor se desconecta a mitad de la copia (antes quedaba "enviando" sin avisar); ahora se muestra un aviso y se puede reintentar compartiendo el mismo enlace, ya que el envío solo se bloquea tras completarse con éxito.
 
 ## [0.3.0] - 2026-09-24
 
@@ -61,7 +61,7 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 ## [0.2.5] - 2026-09-24
 
 ### Fixed
-- El texto se veía demasiado chico en móviles: se agregó un breakpoint (`max-width: 480px`) que aumenta los tamaños de fuente en pantallas de celular.
+- El texto se veía demasiado pequeño en móviles: se agregó un breakpoint (`max-width: 480px`) que aumenta los tamaños de fuente en pantallas de móvil.
 - De paso se corrigió que el breakpoint que apilaba el QR y el link (antes en 380px) no cubría teléfonos reales de ~390-430px de ancho, lo que dejaba el input del enlace comprimido a unos pocos caracteres; ahora ambos ajustes comparten el mismo breakpoint de 480px.
 
 ## [0.2.4] - 2026-09-24

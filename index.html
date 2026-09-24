@@ -528,9 +528,9 @@
     </div>
     <div class="modal-body">
       <h3>Enviar un archivo</h3>
-      <p>Elegí o soltá un archivo. Se genera un enlace y un código QR de un solo uso — compartilo con quien vaya a recibirlo, por el medio que quieras.</p>
+      <p>Elige o suelta un archivo. Se genera un enlace y un código QR de un solo uso: compártelo con quien vaya a recibirlo, por el medio que prefieras.</p>
       <h3>Recibir un archivo</h3>
-      <p>Abrí el enlace (o escaneá el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo soporta, primero te va a pedir dónde guardarlo.</p>
+      <p>Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo.</p>
       <h3>A tener en cuenta</h3>
       <ul>
         <li>El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.</li>
@@ -616,7 +616,7 @@
 
     updateReloadBtn.addEventListener('click', () => {
       if (!waitingWorker) return;
-      // el listener se agrega recién acá: clients.claim() en la primera instalación
+      // el listener se agrega aquí y no antes: clients.claim() en la primera instalación
       // también dispara 'controllerchange', y no queremos recargar en ese caso
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         window.location.reload();
@@ -737,7 +737,7 @@
           const useStreaming = supportsFsAccess && meta.size > STREAM_TO_DISK_THRESHOLD;
           if (useStreaming) {
             recvState.textContent = 'esperando';
-            receiverStatus.textContent = 'Archivo grande: elegí dónde guardarlo para empezar (se escribe directo a disco, sin ocupar memoria del navegador).';
+            receiverStatus.textContent = 'Archivo grande: elige dónde guardarlo para empezar (se escribe directo a disco, sin ocupar memoria del navegador).';
             saveAsBtn.style.display = 'block';
             saveAsBtn.onclick = async () => {
               saveAsBtn.disabled = true;
@@ -986,7 +986,7 @@
           activeConn = null;
           transferInProgress = false;
           sendState.textContent = 'destinatario desconectado';
-          senderStatus.textContent = 'El destinatario se desconectó antes de terminar. Podés compartir el mismo enlace para reintentar.';
+          senderStatus.textContent = 'El destinatario se desconectó antes de terminar. Puedes compartir el mismo enlace para reintentar.';
           senderStatus.className = 'status error';
           setLive(false, 'desconectado');
         });
