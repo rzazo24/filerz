@@ -9,6 +9,7 @@ Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizz
 ## Qué hace
 
 - El emisor elige un archivo y se genera un **enlace de un solo uso** + un **código QR**.
+- Por ahora se envía **un archivo por transferencia** (no hay selección múltiple); para mandar varios, comprímelos en un `.zip` y comparte ese archivo.
 - El receptor abre el enlace (o escanea el QR) y la transferencia arranca sola.
 - Barra de progreso en ambos lados, con **velocidad y tiempo restante estimado**, mientras dura la copia.
 - Botón para **cancelar** la transferencia en cualquier momento y elegir otro archivo. Si el receptor se desconecta a mitad de la copia, se puede reintentar compartiendo el mismo enlace: deja de funcionar recién cuando se completa con éxito.

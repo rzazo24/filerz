@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.8.5] - 2026-09-24
+
+### Added
+- Se documenta en el README (ambos idiomas) y en el modal de ayuda que por ahora solo se envía un archivo por transferencia, con el workaround de comprimir varios en un `.zip`. No se implementa selección múltiple todavía.
+
 ## [0.8.4] - 2026-09-24
 
 ### Fixed
@@ -128,7 +133,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.4...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.5...HEAD
+[0.8.5]: https://github.com/rzazo24/filerz/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/rzazo24/filerz/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/rzazo24/filerz/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/rzazo24/filerz/compare/v0.8.1...v0.8.2

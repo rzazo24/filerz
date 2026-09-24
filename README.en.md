@@ -9,6 +9,7 @@ Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file tra
 ## What it does
 
 - The sender picks a file and a **one-time link** + a **QR code** are generated.
+- Right now it's **one file per transfer** (no multi-select yet); to send several, zip them up and share that file instead.
 - The recipient opens the link (or scans the QR code) and the transfer starts on its own.
 - A progress bar on both sides, with **transfer speed and estimated time left**, while the copy is running.
 - A **cancel** button to stop the transfer at any point and pick another file. If the recipient disconnects mid-transfer, you can retry by sharing the same link: it only stops working once the transfer actually completes.
