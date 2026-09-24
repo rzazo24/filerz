@@ -7,6 +7,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-09-24
+
+### Fixed
+- Renombrado `filerz.html` → `index.html`: hosts estáticos como Vercel sirven `/` buscando `index.html`, así que sin él la raíz del sitio devolvía 404.
+
 ## [0.2.2] - 2026-09-24
 
 ### Added
@@ -30,7 +35,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/rzazo24/filerz/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/rzazo24/filerz/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/rzazo24/filerz/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/rzazo24/filerz/compare/v0.1.0...v0.2.0
