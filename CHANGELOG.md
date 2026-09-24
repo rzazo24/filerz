@@ -7,6 +7,12 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-09-24
+
+### Fixed
+- El texto se veía demasiado chico en móviles: se agregó un breakpoint (`max-width: 480px`) que aumenta los tamaños de fuente en pantallas de celular.
+- De paso se corrigió que el breakpoint que apilaba el QR y el link (antes en 380px) no cubría teléfonos reales de ~390-430px de ancho, lo que dejaba el input del enlace comprimido a unos pocos caracteres; ahora ambos ajustes comparten el mismo breakpoint de 480px.
+
 ## [0.2.4] - 2026-09-24
 
 ### Changed
@@ -40,7 +46,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.5...HEAD
+[0.2.5]: https://github.com/rzazo24/filerz/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/rzazo24/filerz/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/rzazo24/filerz/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/rzazo24/filerz/compare/v0.2.1...v0.2.2
