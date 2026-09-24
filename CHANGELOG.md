@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-09-24
+
+### Added
+- Nueva forma de recibir sin depender del enlace: en la pantalla principal se puede escribir el código a mano (acepta el código solo o una URL completa pegada) o escanear el QR con la cámara del dispositivo directamente desde la página, sin salir a una app externa. Usa [jsQR](https://github.com/cozmo/jsQR) vía CDN para decodificar el video en vivo; si la cámara no está disponible o la librería no carga, se avisa con un mensaje claro y queda la opción de escribir el código a mano.
+
 ## [0.9.1] - 2026-09-24
 
 ### Changed
@@ -143,7 +148,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/rzazo24/filerz/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/rzazo24/filerz/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/rzazo24/filerz/compare/v0.8.5...v0.9.0
 [0.8.5]: https://github.com/rzazo24/filerz/compare/v0.8.4...v0.8.5

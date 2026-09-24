@@ -28,6 +28,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 <style>
   :root {
@@ -195,6 +196,59 @@
     font-size: 15px;
   }
   input[type="file"] { display: none; }
+
+  .receive-alt {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 3px dashed var(--line);
+  }
+  .receive-alt.hidden { display: none; }
+  .receive-alt label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: var(--text-soft);
+  }
+  .receive-alt-row { display: flex; gap: 6px; }
+  .code-input {
+    flex: 1;
+    min-width: 0;
+    font-family: 'Pixelify Sans', monospace;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 9px 10px;
+    border: 2px solid var(--line);
+    border-radius: 0;
+    background: var(--surface);
+    color: var(--text);
+  }
+  button.scan-btn {
+    width: var(--icon-btn-size);
+    height: var(--icon-btn-size);
+    flex-shrink: 0;
+    padding: 0;
+    font-size: 9px;
+    background: var(--surface-2);
+    color: var(--text);
+    box-shadow: none;
+  }
+  button.scan-btn:hover { background: var(--accent-soft); }
+  button.scan-btn:active { transform: translate(1px, 1px); }
+
+  .scan-video-wrap {
+    border: 3px solid var(--line);
+    background: #000;
+    overflow: hidden;
+    line-height: 0;
+  }
+  .scan-video-wrap video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 46vh;
+    object-fit: cover;
+  }
+  #scanStatus { margin-top: 12px; margin-bottom: 0; }
 
   .file-card {
     display: none;
@@ -463,6 +517,9 @@
     .modal-head h2 { font-size: 14px; }
     .modal-body h3 { font-size: 11px; }
     .modal-body p, .modal-body li { font-size: 16px; }
+    .receive-alt label { font-size: 16px; }
+    .code-input { font-size: 16px; }
+    button.scan-btn { font-size: 10px; }
   }
 </style>
 </head>
@@ -485,6 +542,15 @@
       <small data-i18n="dropSubtitle">Viaja directo al otro navegador, sin pasar por ningún servidor</small>
     </div>
     <input type="file" id="fileInput">
+
+    <div class="receive-alt" id="receiveAlt">
+      <label for="codeInput" data-i18n="receiveAltLabel">¿Tienes un código?</label>
+      <div class="receive-alt-row">
+        <input type="text" id="codeInput" class="code-input" placeholder="abcd-1234" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button type="button" id="codeSubmitBtn" data-i18n="receiveBtn">Recibir</button>
+        <button type="button" class="scan-btn" id="scanBtn" aria-label="Escanear código QR" data-i18n-label="scanAriaLabel">QR</button>
+      </div>
+    </div>
 
     <div class="file-card" id="fileCard">
       <div class="file-glyph" id="fileGlyph">·</div>
@@ -558,7 +624,7 @@
       <h3 data-i18n="helpSendHeading">Enviar un archivo</h3>
       <p data-i18n="helpSendBody">Elige o suelta un archivo. Se genera un enlace y un código QR de un solo uso: compártelo con quien vaya a recibirlo, por el medio que prefieras.</p>
       <h3 data-i18n="helpReceiveHeading">Recibir un archivo</h3>
-      <p data-i18n="helpReceiveBody">Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo.</p>
+      <p data-i18n="helpReceiveBody">Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo. Si no tienes el enlace a mano, en la pantalla principal puedes escribir el código o escanear el QR con el botón dedicado.</p>
       <h3 data-i18n="helpNotesHeading">A tener en cuenta</h3>
       <ul>
         <li data-i18n="helpNote1">El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.</li>
@@ -568,6 +634,21 @@
         <li data-i18n="helpNote5">Por ahora se envía un archivo por transferencia: si necesitas mandar varios, comprímelos en un .zip y comparte ese archivo.</li>
       </ul>
       <p class="modal-repo"><span data-i18n="helpRepoLabel">Código abierto (MIT):</span> <a href="https://github.com/rzazo24/filerz" target="_blank" rel="noopener noreferrer">github.com/rzazo24/filerz</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="scanOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="scanTitle">
+    <div class="modal-head">
+      <h2 id="scanTitle" data-i18n="scanTitle">Escanear código QR</h2>
+      <button type="button" class="modal-close" id="scanCloseBtn" aria-label="Cerrar" data-i18n-label="closeScanAriaLabel">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="scan-video-wrap">
+        <video id="scanVideo" autoplay playsinline muted></video>
+      </div>
+      <p class="status" id="scanStatus" data-i18n="scanHint">Apunta la cámara al código QR.</p>
     </div>
   </div>
 </div>
@@ -606,7 +687,7 @@
       helpSendHeading: 'Enviar un archivo',
       helpSendBody: 'Elige o suelta un archivo. Se genera un enlace y un código QR de un solo uso: compártelo con quien vaya a recibirlo, por el medio que prefieras.',
       helpReceiveHeading: 'Recibir un archivo',
-      helpReceiveBody: 'Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo.',
+      helpReceiveBody: 'Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo. Si no tienes el enlace a mano, en la pantalla principal puedes escribir el código o escanear el QR con el botón dedicado.',
       helpNotesHeading: 'A tener en cuenta',
       helpNote1: 'El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.',
       helpNote2: 'Ambas pestañas deben quedar abiertas mientras dura la copia.',
@@ -614,6 +695,15 @@
       helpNote4: 'Si la conexión se corta a mitad de la copia, puedes compartir el mismo enlace de nuevo para reintentar.',
       helpNote5: 'Por ahora se envía un archivo por transferencia: si necesitas mandar varios, comprímelos en un .zip y comparte ese archivo.',
       helpRepoLabel: 'Código abierto (MIT):',
+      receiveAltLabel: '¿Tienes un código?',
+      receiveBtn: 'Recibir',
+      scanAriaLabel: 'Escanear código QR',
+      scanTitle: 'Escanear código QR',
+      closeScanAriaLabel: 'Cerrar',
+      scanHint: 'Apunta la cámara al código QR.',
+      scanNotFound: 'No se pudo leer un código válido.',
+      scanCameraError: 'No se pudo acceder a la cámara. Puedes escribir el código a mano.',
+      scanLibraryError: 'No se pudo cargar el lector de QR. Puedes escribir el código a mano.',
       statusReady: 'listo',
       connecting: 'conectando',
       connected: 'conectado',
@@ -682,7 +772,7 @@
       helpSendHeading: 'Sending a file',
       helpSendBody: "Choose or drop a file. A one-time link and QR code are generated — share it with whoever's receiving it, however you like.",
       helpReceiveHeading: 'Receiving a file',
-      helpReceiveBody: "Open the link (or scan the QR code) and the download starts on its own. If the file is large and your browser supports it, it'll first ask where to save it.",
+      helpReceiveBody: "Open the link (or scan the QR code) and the download starts on its own. If the file is large and your browser supports it, it'll first ask where to save it. If you don't have the link handy, on the main screen you can type the code or scan the QR with the dedicated button.",
       helpNotesHeading: 'Good to know',
       helpNote1: 'The file travels directly between the two browsers over WebRTC: it never touches a server of ours.',
       helpNote2: 'Both tabs need to stay open for the whole transfer.',
@@ -690,6 +780,15 @@
       helpNote4: "If the connection drops mid-transfer, you can share the same link again to retry.",
       helpNote5: "Right now only one file is sent per transfer: if you need to send several, zip them up first and share that file instead.",
       helpRepoLabel: 'Open source (MIT):',
+      receiveAltLabel: 'Got a code?',
+      receiveBtn: 'Receive',
+      scanAriaLabel: 'Scan QR code',
+      scanTitle: 'Scan QR code',
+      closeScanAriaLabel: 'Close',
+      scanHint: 'Point the camera at the QR code.',
+      scanNotFound: "Couldn't read a valid code.",
+      scanCameraError: "Couldn't access the camera. You can type the code by hand instead.",
+      scanLibraryError: "Couldn't load the QR reader. You can type the code by hand instead.",
       statusReady: 'ready',
       connecting: 'connecting',
       connected: 'connected',
@@ -905,7 +1004,109 @@
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && helpOverlay.classList.contains('show')) closeHelp();
+    if (e.key === 'Escape' && scanOverlay.classList.contains('show')) stopScan();
   });
+
+  function normalizeCode(raw) {
+    const trimmed = (raw || '').trim();
+    try {
+      const maybeUrl = new URL(trimmed);
+      const fromHash = new URLSearchParams(maybeUrl.hash.replace(/^#/, '')).get('r');
+      if (fromHash) return fromHash;
+    } catch (e) { /* no era una URL completa, se usa tal cual */ }
+    return trimmed;
+  }
+
+  function goToReceiveCode(raw) {
+    const code = normalizeCode(raw);
+    if (!code) return;
+    location.hash = 'r=' + encodeURIComponent(code);
+    location.reload();
+  }
+
+  const codeInput = document.getElementById('codeInput');
+  const codeSubmitBtn = document.getElementById('codeSubmitBtn');
+  if (codeSubmitBtn) {
+    codeSubmitBtn.addEventListener('click', () => goToReceiveCode(codeInput.value));
+    codeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') goToReceiveCode(codeInput.value);
+    });
+  }
+
+  const scanBtn = document.getElementById('scanBtn');
+  const scanOverlay = document.getElementById('scanOverlay');
+  const scanCloseBtn = document.getElementById('scanCloseBtn');
+  const scanVideo = document.getElementById('scanVideo');
+  const scanStatus = document.getElementById('scanStatus');
+  let scanStream = null;
+  let scanRafId = null;
+
+  function stopCamera() {
+    if (scanRafId) cancelAnimationFrame(scanRafId);
+    scanRafId = null;
+    if (scanStream) {
+      scanStream.getTracks().forEach((track) => track.stop());
+      scanStream = null;
+    }
+    scanVideo.srcObject = null;
+  }
+  function stopScan() {
+    stopCamera();
+    scanOverlay.classList.remove('show');
+  }
+
+  async function startScan() {
+    scanOverlay.classList.add('show');
+    if (typeof jsQR !== 'function') {
+      setKeyedText(scanStatus, 'scanLibraryError');
+      scanStatus.className = 'status error';
+      return;
+    }
+    setKeyedText(scanStatus, 'scanHint');
+    scanStatus.className = 'status';
+    try {
+      scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      scanVideo.srcObject = scanStream;
+      await scanVideo.play();
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const tick = () => {
+        if (!scanStream) return;
+        try {
+          if (scanVideo.readyState === scanVideo.HAVE_ENOUGH_DATA) {
+            canvas.width = scanVideo.videoWidth;
+            canvas.height = scanVideo.videoHeight;
+            ctx.drawImage(scanVideo, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            if (code && code.data) {
+              stopScan();
+              goToReceiveCode(code.data);
+              return;
+            }
+          }
+        } catch (e) {
+          stopCamera();
+          setKeyedText(scanStatus, 'scanLibraryError');
+          scanStatus.className = 'status error';
+          return;
+        }
+        scanRafId = requestAnimationFrame(tick);
+      };
+      scanRafId = requestAnimationFrame(tick);
+    } catch (err) {
+      setKeyedText(scanStatus, 'scanCameraError');
+      scanStatus.className = 'status error';
+    }
+  }
+
+  if (scanBtn) {
+    scanBtn.addEventListener('click', startScan);
+    scanCloseBtn.addEventListener('click', stopScan);
+    scanOverlay.addEventListener('click', (e) => {
+      if (e.target === scanOverlay) stopScan();
+    });
+  }
 
   const themeToggle = document.getElementById('themeToggle');
   const themeColorMeta = document.getElementById('themeColorMeta');
@@ -1103,6 +1304,7 @@
     // ---------- SENDER ----------
     const drop = document.getElementById('drop');
     const fileInput = document.getElementById('fileInput');
+    const receiveAlt = document.getElementById('receiveAlt');
     const fileCard = document.getElementById('fileCard');
     const fileGlyph = document.getElementById('fileGlyph');
     const fileName = document.getElementById('fileName');
@@ -1153,6 +1355,7 @@
 
     function resetSenderUI(statusKey) {
       selectedFile = null;
+      receiveAlt.classList.remove('hidden');
       fileCard.classList.remove('show');
       shareRow.classList.remove('show');
       sendProgressWrap.classList.remove('show');
@@ -1183,6 +1386,7 @@
       teardownPeer();
       cancelledBySender = false;
       selectedFile = file;
+      receiveAlt.classList.add('hidden');
       fileCard.classList.add('show');
       fileGlyph.textContent = extGlyph(file.name);
       fileName.textContent = file.name;

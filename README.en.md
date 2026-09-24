@@ -10,7 +10,7 @@ Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file tra
 
 - The sender picks a file and a **one-time link** + a **QR code** are generated.
 - Right now it's **one file per transfer** (no multi-select yet); to send several, zip them up and share that file instead.
-- The recipient opens the link (or scans the QR code) and the transfer starts on its own.
+- The recipient opens the link (or scans the QR code) and the transfer starts on its own. Without the link handy, they can also type the code directly on the page or scan the QR with the device's camera, no external app needed.
 - A progress bar on both sides, with **transfer speed and estimated time left**, while the copy is running.
 - A **cancel** button to stop the transfer at any point and pick another file. If the recipient disconnects mid-transfer, you can retry by sharing the same link: it only stops working once the transfer actually completes.
 - The file never touches a backend: it travels directly between the two browsers over an `RTCDataChannel`.
@@ -25,9 +25,10 @@ Everything lives in a single self-contained HTML file (`index.html`), with no bu
 
 - **[PeerJS](https://peerjs.com/)** wraps WebRTC and handles the initial signaling (the SDP/ICE exchange the two browsers need to find each other) using the public **PeerJS Cloud** broker. Once the connection is established, data no longer goes through that broker. Instead of the long UUID it assigns by default, a short 8-character ID split into two blocks (`abcd-1234`) is generated, so the link stays short and easy to read or type by hand (with an automatic retry if it happens to collide with one already in use).
 - **[qrcodejs](https://github.com/davidshimjs/qrcodejs)** generates the QR code with the session link.
+- **[jsQR](https://github.com/cozmo/jsQR)** decodes QR codes live from the camera (`getUserMedia`) so you can scan another device's code without leaving the page. If the camera isn't available or the library fails to load, a clear message is shown and typing the code by hand is still an option.
 - The file is sent in 16 KB chunks over the data channel, with flow control so the outgoing buffer never gets flooded. For files over 200 MB in supporting browsers (desktop Chrome/Edge), the recipient writes straight to disk using the File System Access API; otherwise, chunks are reassembled in memory until the final `Blob` is ready to download.
 
-Both libraries load from a CDN (jsDelivr / cdnjs), so the site can be served as-is, no `npm install` or bundlers needed.
+All libraries load from a CDN (jsDelivr / cdnjs), so the site can be served as-is, no `npm install` or bundlers needed.
 
 - `manifest.json` describes the installable app (icons, colors, name), and `sw.js` is the service worker: it caches the shell (`index.html`, the manifest, and the icons) so the app opens instantly and keeps working offline. The transfer itself still needs a network connection, of course — the service worker doesn't cache transferred files or intercept PeerJS signaling.
 
