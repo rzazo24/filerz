@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-09-24
+
+### Fixed
+- Los botones "Copiar" (del enlace y del código) desbordaban el borde de la tarjeta en algunos móviles en modo PWA, por diferencia de métricas entre la fuente pixel-art real del dispositivo y la de respaldo usada al probar. En pantallas estrechas, el campo y su botón ahora se apilan (input arriba, botón a ancho completo debajo), independientemente del ancho real de la fuente.
+
 ## [0.11.0] - 2026-09-24
 
 ### Added
