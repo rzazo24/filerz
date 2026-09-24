@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-09-24
+
+### Changed
+- Los 4 botones del encabezado (ayuda, idioma, tema, estado) ahora tienen exactamente el mismo tamaño (cuadrados de 40×40px, 44×44px en móvil). El pill de estado dejó de mostrar el texto ("listo", "enviando", etc.) todo el tiempo: ahora se ve como los demás y ese texto queda disponible al pasar el mouse (`title`) o para lectores de pantalla (`role="status"` + texto oculto visualmente).
+
 ## [0.8.1] - 2026-09-24
 
 ### Fixed
@@ -112,7 +117,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/rzazo24/filerz/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/rzazo24/filerz/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/rzazo24/filerz/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/rzazo24/filerz/compare/v0.6.1...v0.7.0
