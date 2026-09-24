@@ -9,6 +9,12 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-09-24
+
+### Fixed
+- El deploy en Vercel fallaba ("No Output Directory named 'public' found") desde que `vercel.json` empezó a declarar un `buildCommand` (aunque fuera un no-op): eso pone a Vercel en modo build de verdad, que espera los artefactos en `public/`. Se quita `buildCommand` (solo hacía falta `installCommand` para evitar el `npm install` de Playwright) y el sitio vuelve a servirse directo desde la raíz del repo, como antes.
+- Se agrega `.vercelignore` para que `tests/`, `playwright.config.js` y `CLAUDE.md` no terminen publicados como archivos estáticos del sitio (quedaban expuestos en `/tests/...`, `/playwright.config.js`, `/CLAUDE.md` sin querer).
+
 ## [0.12.0] - 2026-09-24
 
 ### Added
@@ -195,7 +201,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/rzazo24/filerz/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/rzazo24/filerz/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/rzazo24/filerz/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/rzazo24/filerz/compare/v0.11.0...v0.11.1
