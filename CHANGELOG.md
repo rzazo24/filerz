@@ -7,6 +7,14 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-24
+
+### Added
+- Botón para alternar entre modo oscuro y claro (el CSS del tema claro ya existía pero no había forma de activarlo). La preferencia se guarda en `localStorage` y se aplica antes del primer render para evitar parpadeo.
+
+### Fixed
+- Control de flujo (backpressure) al enviar: el emisor ahora vigila `bufferedAmount` del canal de datos y pausa el envío de nuevos fragmentos hasta que el buffer drene, en vez de encolarlos sin límite. Evita picos de memoria y cortes de conexión con archivos grandes o conexiones lentas.
+
 ## [0.2.6] - 2026-09-24
 
 ### Added
@@ -51,7 +59,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.6...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/rzazo24/filerz/compare/v0.2.6...v0.3.0
 [0.2.6]: https://github.com/rzazo24/filerz/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/rzazo24/filerz/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/rzazo24/filerz/compare/v0.2.3...v0.2.4
