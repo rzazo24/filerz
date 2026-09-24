@@ -1,0 +1,15 @@
+{
+  "name": "filerz-tests",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only tooling to test filerz's index.html. Does not affect the deployed app (see vercel.json).",
+  "scripts": {
+    "test:unit": "node --test tests/unit/*.test.mjs",
+    "test:e2e": "playwright test",
+    "test": "npm run test:unit && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "jsqr": "^1.4.0"
+  }
+}

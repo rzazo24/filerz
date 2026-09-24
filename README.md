@@ -48,6 +48,19 @@ python3 -m http.server 8080
 
 Abre `http://localhost:8080` en dos pestañas (o dos dispositivos en la misma red) para simular emisor y receptor.
 
+## Tests
+
+Hay una suite de tests, separada de la app en sí (no afecta el despliegue, ver `vercel.json`):
+
+```bash
+npm install       # una vez
+npm test          # unitarios + end-to-end
+npm run test:unit # solo lógica pura (rápido, sin navegador)
+npm run test:e2e  # solo Playwright (levanta un server local solo)
+```
+
+Los unitarios (`tests/unit/`) prueban funciones puras (generación de ID corto, parseo de código/URL pegada, paridad de claves ES/EN) extrayéndolas del propio `index.html`. Los end-to-end (`tests/e2e/`) usan Playwright: arman el flujo completo emisor→receptor contra el broker real de PeerJS Cloud, decodifican el QR generado para confirmar que apunta al enlace correcto, y revisan que no haya overflow horizontal en el layout móvil.
+
 ## Desplegar
 
 Pensado para desplegarse como sitio estático en **Vercel**: no hace falta build command ni configuración adicional, basta con importar el repo. También puedes usar el botón de arriba para clonarlo y desplegarlo directo.

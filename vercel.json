@@ -1,4 +1,6 @@
 {
+  "installCommand": "echo 'Sitio estático, sin dependencias de runtime: se omite npm install (package.json es solo para tests locales)'",
+  "buildCommand": "echo 'Sin build: se sirve index.html tal cual'",
   "headers": [
     {
       "source": "/sw.js",

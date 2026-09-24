@@ -9,6 +9,12 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-09-24
+
+### Added
+- Suite de tests, separada de la app (no afecta el despliegue): unitarios con `node --test` para lógica pura (ID corto, parseo de código/URL pegada, paridad de claves del i18n ES/EN) extraída directamente de `index.html`, y end-to-end con Playwright que arman el flujo completo emisor→receptor contra el broker real de PeerJS Cloud, decodifican el QR generado, revisan el layout en móvil y validan que un enlace ya usado rechace una segunda conexión.
+- `vercel.json` ahora fuerza `installCommand`/`buildCommand` a no-ops, para que Vercel no intente correr `npm install` (y el postinstall de Playwright) en cada deploy solo porque existe un `package.json` de testing.
+
 ## [0.11.2] - 2026-09-24
 
 ### Fixed
@@ -189,7 +195,13 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.10.3...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/rzazo24/filerz/compare/v0.11.2...v0.12.0
+[0.11.2]: https://github.com/rzazo24/filerz/compare/v0.11.1...v0.11.2
+[0.11.1]: https://github.com/rzazo24/filerz/compare/v0.11.0...v0.11.1
+[0.11.0]: https://github.com/rzazo24/filerz/compare/v0.10.5...v0.11.0
+[0.10.5]: https://github.com/rzazo24/filerz/compare/v0.10.4...v0.10.5
+[0.10.4]: https://github.com/rzazo24/filerz/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/rzazo24/filerz/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/rzazo24/filerz/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/rzazo24/filerz/compare/v0.10.0...v0.10.1
