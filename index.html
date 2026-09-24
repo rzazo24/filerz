@@ -95,10 +95,12 @@
   .top {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 10px;
     margin-bottom: 22px;
   }
   .top h1 {
+    flex-shrink: 0;
     font-family: 'Press Start 2P', monospace;
     font-size: 15px;
     font-weight: 400;
@@ -122,7 +124,10 @@
   .top-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 8px;
+    margin-left: auto;
   }
   button.theme-toggle, button.help-toggle, button.lang-toggle {
     font-size: 14px;
