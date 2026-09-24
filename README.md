@@ -6,6 +6,8 @@ Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizz
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/rzazo24/filerz)
 
+![Captura de Filerz: pantalla del emisor con el archivo elegido, el enlace y el código QR](screenshots/sender-es.png)
+
 ## Qué hace
 
 - El emisor elige un archivo y se genera un **enlace de un solo uso** + un **código QR**.

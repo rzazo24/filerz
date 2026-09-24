@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.10.5] - 2026-09-24
+
+### Documentation
+- Captura de pantalla de la app (pantalla del emisor con el archivo elegido, enlace y QR) en README.md y README.en.md, una por idioma.
+
 ## [0.10.4] - 2026-09-24
 
 ### Documentation
