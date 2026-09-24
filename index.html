@@ -108,18 +108,19 @@
     letter-spacing: 1px;
     text-shadow: 3px 3px 0 var(--accent-dim);
   }
+  :root { --icon-btn-size: 40px; }
   .pill {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 8.5px;
-    color: var(--text-soft);
+    justify-content: center;
+    width: var(--icon-btn-size);
+    height: var(--icon-btn-size);
+    flex-shrink: 0;
     background: var(--surface-2);
-    border: 2px solid var(--line);
-    padding: 6px 10px;
+    border: 3px solid var(--line);
+    padding: 0;
     border-radius: 0;
-    text-transform: uppercase;
+    cursor: default;
   }
   .top-actions {
     display: flex;
@@ -130,8 +131,10 @@
     margin-left: auto;
   }
   button.theme-toggle, button.help-toggle, button.lang-toggle {
+    width: var(--icon-btn-size);
+    height: var(--icon-btn-size);
+    padding: 0;
     font-size: 14px;
-    padding: 6px 9px;
     background: var(--surface-2);
     color: var(--text);
     box-shadow: none;
@@ -140,8 +143,17 @@
   button.theme-toggle:active, button.help-toggle:active, button.lang-toggle:active { transform: translate(1px, 1px); }
   button.lang-toggle { font-family: 'Press Start 2P', monospace; font-size: 9px; }
 
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
   .dot {
-    width: 8px; height: 8px;
+    width: 10px; height: 10px;
     border-radius: 0;
     background: var(--text-soft);
     flex-shrink: 0;
@@ -425,7 +437,7 @@
   @media (max-width: 480px) {
     .share { flex-direction: column; align-items: flex-start; }
     .top h1 { font-size: 17px; }
-    .pill { font-size: 9.5px; }
+    :root { --icon-btn-size: 44px; }
     .drop p { font-size: 21px; }
     .drop small { font-size: 16px; }
     .file-glyph { font-size: 10px; }
@@ -439,8 +451,9 @@
     .progress-speed { font-size: 14px; }
     .status { font-size: 17px; }
     .footer-note { font-size: 15px; }
-    button.theme-toggle, button.help-toggle, button.lang-toggle { font-size: 16px; padding: 7px 10px; }
+    button.theme-toggle, button.help-toggle, button.lang-toggle { font-size: 16px; }
     button.lang-toggle { font-size: 11px; }
+    .dot { width: 11px; height: 11px; }
     .cancel-btn { font-size: 13px; padding: 7px 10px; }
     .update-toast { font-size: 15px; bottom: 12px; }
     .update-toast button { font-size: 11px; }
@@ -459,7 +472,7 @@
       <button type="button" class="help-toggle" id="helpToggle" aria-label="Ayuda" data-i18n-label="helpAriaLabel">?</button>
       <button type="button" class="lang-toggle" id="langToggle" aria-label="Switch to English">EN</button>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar a modo claro">☾</button>
-      <div class="pill"><span class="dot" id="statusDot"></span><span id="statusLabel" data-i18n="statusReady">listo</span></div>
+      <div class="pill" id="statusPill" role="status"><span class="dot" id="statusDot"></span><span id="statusLabel" class="sr-only" data-i18n="statusReady">listo</span></div>
     </div>
   </div>
 
@@ -760,6 +773,7 @@
 
   const statusDot = document.getElementById('statusDot');
   const statusLabel = document.getElementById('statusLabel');
+  const statusPill = document.getElementById('statusPill');
   const senderView = document.getElementById('senderView');
   const receiverView = document.getElementById('receiverView');
 
@@ -772,9 +786,12 @@
     const ext = (name.split('.').pop() || '').slice(0, 3).toUpperCase();
     return ext || '·';
   }
+  let currentStatusKey = 'statusReady';
   function setLive(on, key) {
+    currentStatusKey = key;
     statusDot.classList.toggle('live', !!on);
     setKeyedText(statusLabel, key);
+    statusPill.title = t(key);
   }
   function formatDuration(seconds) {
     if (!isFinite(seconds) || seconds < 0) return '';
@@ -907,6 +924,7 @@
     syncThemeToggle();
     applyStaticTranslations();
     retranslateKeyed();
+    statusPill.title = t(currentStatusKey);
   }
   renderLang();
   langToggle.addEventListener('click', () => {
