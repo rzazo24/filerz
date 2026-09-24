@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-24
+
+### Added
+- Campo adicional debajo del enlace, en la pantalla del emisor, con solo el código de la sesión (p. ej. `ABCD-1234`) y su propio botón de copiar. Pensado para cuando el enlace completo es incómodo de copiar o dictar, sobre todo en pantallas de móvil.
+
 ## [0.10.5] - 2026-09-24
 
 ### Documentation

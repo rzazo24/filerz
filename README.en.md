@@ -10,7 +10,7 @@ Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file tra
 
 ## What it does
 
-- The sender picks a file and a **one-time link** + a **QR code** are generated.
+- The sender picks a file and a **one-time link** + a **QR code** are generated. Below the link there's a field with just the code (e.g. `ABCD-1234`), to copy or read aloud when the full link is awkward to share, especially on small screens.
 - Right now it's **one file per transfer** (no multi-select yet); to send several, zip them up and share that file instead.
 - The recipient opens the link (or scans the QR code) and the transfer starts on its own. Without the link handy, they can also type the code directly on the page or scan the QR with the device's camera, no external app needed.
 - A progress bar on both sides, with **transfer speed and estimated time left**, while the copy is running.
