@@ -1,5 +1,7 @@
 # Changelog
 
+_This changelog is only kept in Spanish. See [README.en.md](README.en.md) for the project in English._
+
 Todos los cambios notables de este proyecto se documentan en este archivo.
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),

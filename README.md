@@ -1,5 +1,7 @@
 # Filerz
 
+[English](README.en.md) | **Español**
+
 Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizza): el archivo viaja directo de un navegador a otro por WebRTC, sin subirse nunca a ningún servidor propio.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/rzazo24/filerz)
