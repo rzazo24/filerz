@@ -24,6 +24,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
 <style>
   :root {
     --bg: #0a0612;
@@ -119,15 +120,15 @@
     align-items: center;
     gap: 8px;
   }
-  button.theme-toggle {
+  button.theme-toggle, button.help-toggle {
     font-size: 14px;
     padding: 6px 9px;
     background: var(--surface-2);
     color: var(--text);
     box-shadow: none;
   }
-  button.theme-toggle:hover { background: var(--accent-soft); }
-  button.theme-toggle:active { transform: translate(1px, 1px); }
+  button.theme-toggle:hover, button.help-toggle:hover { background: var(--accent-soft); }
+  button.theme-toggle:active, button.help-toggle:active { transform: translate(1px, 1px); }
 
   .dot {
     width: 8px; height: 8px;
@@ -345,6 +346,72 @@
     box-shadow: none;
   }
 
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 6, 18, 0.72);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background: var(--surface);
+    border: 4px solid var(--line);
+    box-shadow: 0 0 0 4px var(--bg), 8px 8px 0 0 var(--accent);
+    padding: 20px 22px;
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .modal-head h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 13px;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+  .modal button.modal-close {
+    font-size: 13px;
+    padding: 6px 9px;
+    background: var(--surface-2);
+    color: var(--text);
+    box-shadow: none;
+  }
+  .modal button.modal-close:hover { background: var(--danger); }
+  .modal button.modal-close:active { transform: translate(1px, 1px); }
+  .modal-body h3 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    margin: 16px 0 8px;
+  }
+  .modal-body h3:first-child { margin-top: 0; }
+  .modal-body p, .modal-body li {
+    font-size: 15px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+  .modal-body ul { margin: 0; padding-left: 20px; }
+  .modal-body li + li { margin-top: 6px; }
+  .modal-repo {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 3px dashed var(--line);
+  }
+  .modal-repo a { color: var(--accent); }
+
   @media (max-width: 480px) {
     .share { flex-direction: column; align-items: flex-start; }
     .top h1 { font-size: 17px; }
@@ -362,10 +429,13 @@
     .progress-speed { font-size: 14px; }
     .status { font-size: 17px; }
     .footer-note { font-size: 15px; }
-    button.theme-toggle { font-size: 16px; padding: 7px 10px; }
+    button.theme-toggle, button.help-toggle { font-size: 16px; padding: 7px 10px; }
     .cancel-btn { font-size: 13px; padding: 7px 10px; }
     .update-toast { font-size: 15px; bottom: 12px; }
     .update-toast button { font-size: 11px; }
+    .modal-head h2 { font-size: 14px; }
+    .modal-body h3 { font-size: 11px; }
+    .modal-body p, .modal-body li { font-size: 16px; }
   }
 </style>
 </head>
@@ -375,6 +445,7 @@
   <div class="top">
     <h1>Filerz</h1>
     <div class="top-actions">
+      <button type="button" class="help-toggle" id="helpToggle" aria-label="Ayuda">?</button>
       <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar a modo claro">☾</button>
       <div class="pill"><span class="dot" id="statusDot"></span><span id="statusLabel">listo</span></div>
     </div>
@@ -446,6 +517,28 @@
   <div class="update-toast-actions">
     <button type="button" class="update-dismiss" id="updateDismissBtn">Ahora no</button>
     <button type="button" id="updateReloadBtn">Recargar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="helpOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-head">
+      <h2 id="helpTitle">Ayuda</h2>
+      <button type="button" class="modal-close" id="helpCloseBtn" aria-label="Cerrar ayuda">✕</button>
+    </div>
+    <div class="modal-body">
+      <h3>Enviar un archivo</h3>
+      <p>Elegí o soltá un archivo. Se genera un enlace y un código QR de un solo uso — compartilo con quien vaya a recibirlo, por el medio que quieras.</p>
+      <h3>Recibir un archivo</h3>
+      <p>Abrí el enlace (o escaneá el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo soporta, primero te va a pedir dónde guardarlo.</p>
+      <h3>A tener en cuenta</h3>
+      <ul>
+        <li>El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.</li>
+        <li>Ambas pestañas deben quedar abiertas mientras dura la copia.</li>
+        <li>El enlace es de un solo uso: una vez completada la transferencia, deja de funcionar.</li>
+      </ul>
+      <p class="modal-repo">Código abierto (MIT): <a href="https://github.com/rzazo24/filerz" target="_blank" rel="noopener noreferrer">github.com/rzazo24/filerz</a></p>
+    </div>
   </div>
 </div>
 
@@ -552,6 +645,27 @@
       }).catch(() => {});
     });
   }
+
+  const helpToggle = document.getElementById('helpToggle');
+  const helpOverlay = document.getElementById('helpOverlay');
+  const helpCloseBtn = document.getElementById('helpCloseBtn');
+
+  function openHelp() {
+    helpOverlay.classList.add('show');
+    helpCloseBtn.focus();
+  }
+  function closeHelp() {
+    helpOverlay.classList.remove('show');
+    helpToggle.focus();
+  }
+  helpToggle.addEventListener('click', openHelp);
+  helpCloseBtn.addEventListener('click', closeHelp);
+  helpOverlay.addEventListener('click', (e) => {
+    if (e.target === helpOverlay) closeHelp();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && helpOverlay.classList.contains('show')) closeHelp();
+  });
 
   const themeToggle = document.getElementById('themeToggle');
   const themeColorMeta = document.getElementById('themeColorMeta');
