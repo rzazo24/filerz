@@ -6,6 +6,8 @@ Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file tra
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/rzazo24/filerz)
 
+![Filerz screenshot: sender screen with the chosen file, the link and the QR code](screenshots/sender-en.png)
+
 ## What it does
 
 - The sender picks a file and a **one-time link** + a **QR code** are generated.
