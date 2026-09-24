@@ -7,6 +7,14 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-09-24
+
+### Added
+- Aviso de actualización disponible: cuando se publica una nueva versión, aparece un cartel para recargar la página y activarla al toque, en vez de que el service worker la aplique en silencio.
+
+### Fixed
+- El service worker ya no llama `skipWaiting()` automáticamente al instalar, así que una actualización no reemplaza la versión en uso hasta que el usuario confirme. El listener de `controllerchange` que dispara el reload se agrega recién al confirmar, para no recargar la página de forma espontánea la primera vez que el service worker toma control (`clients.claim()` también dispara ese evento en la instalación inicial).
+
 ## [0.6.0] - 2026-09-24
 
 ### Added
@@ -83,7 +91,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/rzazo24/filerz/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/rzazo24/filerz/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/rzazo24/filerz/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rzazo24/filerz/compare/v0.3.0...v0.4.0
