@@ -6,7 +6,7 @@
 <title>Filerz — transferencia directa de archivos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
@@ -54,7 +54,8 @@
       repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 3px),
       radial-gradient(720px 480px at 12% -10%, var(--accent-soft), transparent 60%);
     color: var(--text);
-    font-family: 'VT323', monospace;
+    font-family: 'Pixelify Sans', monospace;
+    font-weight: 500;
     padding: calc(env(safe-area-inset-top, 0px) + 28px) 20px calc(env(safe-area-inset-bottom, 0px) + 28px);
     display: flex;
     align-items: center;
@@ -192,8 +193,9 @@
   .link-input {
     flex: 1;
     min-width: 0;
-    font-family: 'VT323', monospace;
-    font-size: 15px;
+    font-family: 'Pixelify Sans', monospace;
+    font-weight: 500;
+    font-size: 13px;
     padding: 9px 10px;
     border: 2px solid var(--line);
     border-radius: 0;
@@ -239,9 +241,10 @@
   }
   .progress-label {
     display: flex; justify-content: space-between;
-    font-size: 15px; color: var(--text-soft);
+    font-size: 14px; color: var(--text-soft);
     margin-top: 8px;
-    font-family: 'VT323', monospace;
+    font-family: 'Pixelify Sans', monospace;
+    font-weight: 500;
   }
 
   .status {

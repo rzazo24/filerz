@@ -7,6 +7,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-09-24
+
+### Changed
+- Fuente del texto general reemplazada de VT323 a Pixelify Sans: VT323 se veía demasiado angosta/delgada para leer cómodamente; Pixelify Sans mantiene el estilo pixel-art con más peso y legibilidad.
+
 ## [0.2.3] - 2026-09-24
 
 ### Fixed
@@ -35,7 +40,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.4...HEAD
+[0.2.4]: https://github.com/rzazo24/filerz/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/rzazo24/filerz/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/rzazo24/filerz/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/rzazo24/filerz/compare/v0.2.0...v0.2.1
