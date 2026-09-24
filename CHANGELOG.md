@@ -7,6 +7,18 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-24
+
+### Added
+- Botón para cancelar la transferencia y elegir otro archivo, disponible en cuanto se selecciona uno.
+- Velocidad de transferencia y tiempo restante estimado, mostrados en ambos lados durante el envío/recepción.
+- El drop-zone ahora es accesible por teclado (`role="button"`, `tabindex`, `Enter`/`Espacio` abren el selector de archivo).
+- Aviso al cerrar la pestaña (`beforeunload`) mientras hay una transferencia activa, para no perder el envío por accidente.
+
+### Fixed
+- El enlace de un solo uso ahora se invalida de verdad: una vez completada la entrega, cualquier intento posterior de abrirlo recibe un aviso de "enlace ya usado" en vez de reiniciar el envío desde cero o pisar la transferencia en curso.
+- Se detecta cuando el receptor se desconecta a mitad de la copia (antes quedaba "enviando" sin avisar); ahora se muestra un aviso y se puede reintentar compartiendo el mismo enlace, ya que el envío recién se bloquea tras completarse con éxito.
+
 ## [0.3.0] - 2026-09-24
 
 ### Added
@@ -59,7 +71,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/rzazo24/filerz/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rzazo24/filerz/compare/v0.2.6...v0.3.0
 [0.2.6]: https://github.com/rzazo24/filerz/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/rzazo24/filerz/compare/v0.2.4...v0.2.5
