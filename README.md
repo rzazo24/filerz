@@ -10,7 +10,7 @@ Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizz
 
 - El emisor elige un archivo y se genera un **enlace de un solo uso** + un **código QR**.
 - Por ahora se envía **un archivo por transferencia** (no hay selección múltiple); para mandar varios, comprímelos en un `.zip` y comparte ese archivo.
-- El receptor abre el enlace (o escanea el QR) y la transferencia arranca sola.
+- El receptor abre el enlace (o escanea el QR) y la transferencia arranca sola. Si no tiene el enlace a mano, también puede escribir el código directamente en la página o escanear el QR con la cámara del dispositivo, sin salir a una app externa.
 - Barra de progreso en ambos lados, con **velocidad y tiempo restante estimado**, mientras dura la copia.
 - Botón para **cancelar** la transferencia en cualquier momento y elegir otro archivo. Si el receptor se desconecta a mitad de la copia, se puede reintentar compartiendo el mismo enlace: deja de funcionar recién cuando se completa con éxito.
 - El archivo nunca pasa por un backend: viaja directo entre los dos navegadores por un `RTCDataChannel`.
@@ -25,9 +25,10 @@ Todo vive en un único archivo HTML autocontenido (`index.html`), sin paso de bu
 
 - **[PeerJS](https://peerjs.com/)** envuelve WebRTC y resuelve la señalización inicial (el intercambio de SDP/ICE necesario para que los dos navegadores se encuentren) usando el broker público de **PeerJS Cloud**. Una vez establecida la conexión, los datos ya no pasan por ese broker. En vez del UUID largo que asigna por defecto, se genera un ID propio de 8 caracteres separados en dos bloques (`abcd-1234`) para que el enlace sea más corto y fácil de leer o tipear a mano (con reintento automático si por casualidad coincide con uno ya en uso).
 - **[qrcodejs](https://github.com/davidshimjs/qrcodejs)** genera el QR con el enlace de la sesión.
+- **[jsQR](https://github.com/cozmo/jsQR)** decodifica QR en vivo desde la cámara (`getUserMedia`) para poder escanear el código de otro dispositivo sin salir de la página. Si la cámara no está disponible o la librería no carga, se avisa con un mensaje y queda la opción de escribir el código a mano.
 - El archivo se envía en fragmentos de 16 KB por el canal de datos, con control de flujo para no saturar el buffer de salida. Para archivos de más de 200 MB en navegadores compatibles (Chrome/Edge de escritorio), el receptor escribe directo a disco con la File System Access API; en el resto de los casos, los fragmentos se reensamblan en memoria hasta generar el `Blob` final para descargar.
 
-Ambas librerías se cargan por CDN (jsDelivr / cdnjs), así que el sitio se puede servir tal cual, sin `npm install` ni bundlers.
+Todas las librerías se cargan por CDN (jsDelivr / cdnjs), así que el sitio se puede servir tal cual, sin `npm install` ni bundlers.
 
 - `manifest.json` describe la app instalable (íconos, colores, nombre) y `sw.js` es el service worker: cachea el shell (`index.html`, el manifest y los íconos) para que la app abra al instante y funcione incluso sin conexión. La transferencia en sí sigue necesitando red, claro — el service worker no cachea archivos transferidos ni intercepta la señalización de PeerJS.
 
