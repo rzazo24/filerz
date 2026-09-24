@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-09-24
+
+### Fixed
+- El código del enlace era difícil de leer y tipear: la tipografía pixel-art del resto de la app confundía mayúsculas con minúsculas (y algunos números) en el campo de código y en el enlace. Ahora esos dos campos usan una fuente monoespaciada real, y el ID generado es solo en mayúsculas (antes mezclaba mayúsculas y minúsculas). El campo de código además normaliza a mayúsculas lo que se escriba, así que da igual el uso de mayúsculas/minúsculas al tipear.
+
 ## [0.10.0] - 2026-09-24
 
 ### Added
@@ -148,7 +153,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/rzazo24/filerz/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/rzazo24/filerz/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/rzazo24/filerz/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/rzazo24/filerz/compare/v0.8.5...v0.9.0

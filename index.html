@@ -112,7 +112,12 @@
     letter-spacing: 1px;
     text-shadow: 3px 3px 0 var(--accent-dim);
   }
-  :root { --icon-btn-size: 40px; }
+  :root {
+    --icon-btn-size: 40px;
+    /* fuente real para textos que hay que leer/tipear con precisión (enlaces, códigos):
+       la tipografía pixel-art del resto de la app confunde may/min y números */
+    --code-font: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  }
   .pill {
     display: flex;
     align-items: center;
@@ -213,8 +218,8 @@
   .code-input {
     flex: 1;
     min-width: 0;
-    font-family: 'Pixelify Sans', monospace;
-    font-weight: 500;
+    font-family: var(--code-font);
+    text-transform: uppercase;
     font-size: 15px;
     padding: 9px 10px;
     border: 2px solid var(--line);
@@ -318,8 +323,7 @@
   .link-input {
     flex: 1;
     min-width: 0;
-    font-family: 'Pixelify Sans', monospace;
-    font-weight: 500;
+    font-family: var(--code-font);
     font-size: 13px;
     padding: 9px 10px;
     border: 2px solid var(--line);
@@ -891,7 +895,7 @@
     const ext = (name.split('.').pop() || '').slice(0, 3).toUpperCase();
     return ext || '·';
   }
-  const SHORT_ID_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; // sin 0/O/1/l/I
+  const SHORT_ID_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // solo mayúsculas (evita confundir may/min) y sin 0/O/1/I/L
   function generateShortId() {
     let id = '';
     for (let i = 0; i < 8; i++) {
@@ -1012,9 +1016,9 @@
     try {
       const maybeUrl = new URL(trimmed);
       const fromHash = new URLSearchParams(maybeUrl.hash.replace(/^#/, '')).get('r');
-      if (fromHash) return fromHash;
+      if (fromHash) return fromHash.toUpperCase();
     } catch (e) { /* no era una URL completa, se usa tal cual */ }
-    return trimmed;
+    return trimmed.toUpperCase();
   }
 
   function goToReceiveCode(raw) {
