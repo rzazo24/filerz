@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Filerz — transferencia directa de archivos</title>
+<script>
+  try {
+    if (localStorage.getItem('filerz-theme') === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  } catch (e) {}
+</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3IDkiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iOSIgZmlsbD0iI2IxNGVmZiIvPjxnIGZpbGw9IiMwYTA2MTIiPjxyZWN0IHg9IjEiIHk9IjEiIHdpZHRoPSI1IiBoZWlnaHQ9IjEiLz48cmVjdCB4PSIxIiB5PSIyIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIi8+PHJlY3QgeD0iMSIgeT0iMyIgd2lkdGg9IjEiIGhlaWdodD0iMSIvPjxyZWN0IHg9IjEiIHk9IjQiIHdpZHRoPSI0IiBoZWlnaHQ9IjEiLz48cmVjdCB4PSIxIiB5PSI1IiB3aWR0aD0iMSIgaGVpZ2h0PSIxIi8+PHJlY3QgeD0iMSIgeT0iNiIgd2lkdGg9IjEiIGhlaWdodD0iMSIvPjxyZWN0IHg9IjEiIHk9IjciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiLz48L2c+PC9zdmc+">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,6 +107,21 @@
     border-radius: 0;
     text-transform: uppercase;
   }
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  button.theme-toggle {
+    font-size: 14px;
+    padding: 6px 9px;
+    background: var(--surface-2);
+    color: var(--text);
+    box-shadow: none;
+  }
+  button.theme-toggle:hover { background: var(--accent-soft); }
+  button.theme-toggle:active { transform: translate(1px, 1px); }
+
   .dot {
     width: 8px; height: 8px;
     border-radius: 0;
@@ -283,6 +305,7 @@
     .progress-label { font-size: 15px; }
     .status { font-size: 17px; }
     .footer-note { font-size: 15px; }
+    button.theme-toggle { font-size: 16px; padding: 7px 10px; }
   }
 </style>
 </head>
@@ -291,7 +314,10 @@
 <div class="card">
   <div class="top">
     <h1>Filerz</h1>
-    <div class="pill"><span class="dot" id="statusDot"></span><span id="statusLabel">listo</span></div>
+    <div class="top-actions">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar a modo claro">☾</button>
+      <div class="pill"><span class="dot" id="statusDot"></span><span id="statusLabel">listo</span></div>
+    </div>
   </div>
 
   <div id="senderView">
@@ -375,6 +401,24 @@
     statusDot.classList.toggle('live', !!on);
     statusLabel.textContent = label;
   }
+
+  const themeToggle = document.getElementById('themeToggle');
+  function syncThemeToggle() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    themeToggle.textContent = isLight ? '☀' : '☾';
+    themeToggle.setAttribute('aria-label', isLight ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+  }
+  syncThemeToggle();
+  themeToggle.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    if (next === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    try { localStorage.setItem('filerz-theme', next); } catch (e) {}
+    syncThemeToggle();
+  });
 
   if (receiveId) {
     // ---------- RECEIVER ----------
@@ -524,6 +568,21 @@
     }
 
     function sendFileInChunks(conn, file) {
+      const HIGH_WATER_MARK = 4 * 1024 * 1024; // pausar si el buffer de salida supera esto
+      const LOW_WATER_MARK = 1 * 1024 * 1024;  // reanudar cuando drene por debajo de esto
+      const dc = conn.dataChannel;
+      if (dc) {
+        try { dc.bufferedAmountLowThreshold = LOW_WATER_MARK; } catch (e) {}
+      }
+
+      function waitForDrain() {
+        return new Promise((resolve) => {
+          if (!dc || dc.bufferedAmount <= HIGH_WATER_MARK) { resolve(); return; }
+          const onLow = () => { dc.removeEventListener('bufferedamountlow', onLow); resolve(); };
+          dc.addEventListener('bufferedamountlow', onLow);
+        });
+      }
+
       let offset = 0;
       const reader = new FileReader();
 
@@ -533,22 +592,25 @@
       }
 
       reader.onload = (e) => {
-        conn.send({ type: 'chunk', data: e.target.result });
-        offset += e.target.result.byteLength;
-        const pct = Math.min(100, Math.round((offset / file.size) * 100));
-        sendFill.style.width = pct + '%';
-        sendPct.textContent = pct + '%';
-        sendState.textContent = 'enviando';
+        const chunk = e.target.result;
+        waitForDrain().then(() => {
+          conn.send({ type: 'chunk', data: chunk });
+          offset += chunk.byteLength;
+          const pct = Math.min(100, Math.round((offset / file.size) * 100));
+          sendFill.style.width = pct + '%';
+          sendPct.textContent = pct + '%';
+          sendState.textContent = 'enviando';
 
-        if (offset < file.size) {
-          readNext();
-        } else {
-          conn.send({ type: 'done' });
-          sendState.textContent = 'completado';
-          setLive(true, 'completado');
-          senderStatus.textContent = 'Entrega completa.';
-          senderStatus.className = 'status ready';
-        }
+          if (offset < file.size) {
+            readNext();
+          } else {
+            conn.send({ type: 'done' });
+            sendState.textContent = 'completado';
+            setLive(true, 'completado');
+            senderStatus.textContent = 'Entrega completa.';
+            senderStatus.className = 'status ready';
+          }
+        });
       };
 
       readNext();
