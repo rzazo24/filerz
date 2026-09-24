@@ -10,6 +10,7 @@ Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizz
 - El receptor abre el enlace (o escanea el QR) y la transferencia arranca sola.
 - Barra de progreso en ambos lados mientras dura la copia.
 - El archivo nunca pasa por un backend: viaja directo entre los dos navegadores por un `RTCDataChannel`.
+- Es una **PWA instalable**: se puede agregar a la pantalla de inicio (o instalar como app de escritorio) y la interfaz carga al instante gracias al service worker, incluso sin conexión.
 
 ## Cómo funciona
 
@@ -20,6 +21,8 @@ Todo vive en un único archivo HTML autocontenido (`index.html`), sin paso de bu
 - El archivo se envía en fragmentos de 16 KB por el canal de datos, con control de flujo para no saturar el buffer de salida. Para archivos de más de 200 MB en navegadores compatibles (Chrome/Edge de escritorio), el receptor escribe directo a disco con la File System Access API; en el resto de los casos, los fragmentos se reensamblan en memoria hasta generar el `Blob` final para descargar.
 
 Ambas librerías se cargan por CDN (jsDelivr / cdnjs), así que el sitio se puede servir tal cual, sin `npm install` ni bundlers.
+
+- `manifest.json` describe la app instalable (íconos, colores, nombre) y `sw.js` es el service worker: cachea el shell (`index.html`, el manifest y los íconos) para que la app abra al instante y funcione incluso sin conexión. La transferencia en sí sigue necesitando red, claro — el service worker no cachea archivos transferidos ni intercepta la señalización de PeerJS.
 
 ## Requisitos
 

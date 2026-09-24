@@ -7,6 +7,12 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-24
+
+### Added
+- Filerz ahora es una PWA instalable: `manifest.json` con íconos (incluidas variantes maskable) generados a partir del glyph pixel-art existente, y un service worker (`sw.js`) que cachea el shell de la app (HTML, manifest e íconos) para que abra al instante y siga funcionando sin conexión. Las transferencias en sí siguen necesitando red.
+- Meta tags para instalación en iOS/Android (`apple-touch-icon`, `apple-mobile-web-app-*`) y `theme-color` sincronizado con el toggle de tema claro/oscuro.
+
 ## [0.5.0] - 2026-09-24
 
 ### Added
@@ -77,7 +83,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/rzazo24/filerz/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/rzazo24/filerz/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rzazo24/filerz/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rzazo24/filerz/compare/v0.2.6...v0.3.0
