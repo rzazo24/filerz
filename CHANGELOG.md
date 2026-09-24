@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.11.2] - 2026-09-24
+
+### Fixed
+- Ajuste de márgenes en los botones "Copiar" apilados en móvil: ahora dejan hueco a su propia sombra (el efecto pixel-art de la app) para que el borde visual quede alineado con el del campo de arriba, en vez de sobresalir por la derecha.
+
 ## [0.11.1] - 2026-09-24
 
 ### Fixed
