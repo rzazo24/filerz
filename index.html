@@ -150,6 +150,10 @@
     background: var(--accent-soft);
     border-style: solid;
   }
+  .drop:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
   .drop p { margin: 0; font-size: 19px; }
   .drop small {
     display: block;
@@ -170,6 +174,17 @@
     background: var(--surface-2);
   }
   .file-card.show { display: flex; }
+  .cancel-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 12px;
+    padding: 6px 9px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: none;
+  }
+  .cancel-btn:hover { background: var(--danger); color: var(--text); }
+  .cancel-btn:active { transform: translate(1px, 1px); }
   .file-glyph {
     width: 36px; height: 36px;
     border-radius: 0;
@@ -269,6 +284,13 @@
     font-family: 'Pixelify Sans', monospace;
     font-weight: 500;
   }
+  .progress-speed {
+    margin-top: 4px;
+    text-align: right;
+    font-size: 13px;
+    color: var(--text-soft);
+    min-height: 16px;
+  }
 
   .status {
     margin-top: 16px;
@@ -303,9 +325,11 @@
     button { font-size: 11px; }
     button.full { font-size: 12px; }
     .progress-label { font-size: 15px; }
+    .progress-speed { font-size: 14px; }
     .status { font-size: 17px; }
     .footer-note { font-size: 15px; }
     button.theme-toggle { font-size: 16px; padding: 7px 10px; }
+    .cancel-btn { font-size: 13px; padding: 7px 10px; }
   }
 </style>
 </head>
@@ -321,7 +345,7 @@
   </div>
 
   <div id="senderView">
-    <div class="drop" id="drop">
+    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Elegir un archivo para enviar">
       <p>Suelta un archivo aquí o toca para elegirlo</p>
       <small>Viaja directo al otro navegador, sin pasar por ningún servidor</small>
     </div>
@@ -333,6 +357,7 @@
         <div class="file-name" id="fileName"></div>
         <div class="file-meta" id="fileMeta"></div>
       </div>
+      <button type="button" class="cancel-btn" id="cancelBtn" aria-label="Cancelar y elegir otro archivo">✕</button>
     </div>
 
     <div class="share" id="shareRow">
@@ -349,6 +374,7 @@
     <div class="progress-wrap" id="sendProgressWrap">
       <div class="progress-track"><div class="progress-fill" id="sendFill"></div></div>
       <div class="progress-label"><span id="sendPct">0%</span><span id="sendState">esperando destinatario</span></div>
+      <div class="progress-speed" id="sendSpeed"></div>
     </div>
 
     <div class="status" id="senderStatus">Al elegir un archivo se generará un enlace y un código QR de un solo uso.</div>
@@ -365,6 +391,7 @@
     <div class="progress-wrap show">
       <div class="progress-track"><div class="progress-fill" id="recvFill"></div></div>
       <div class="progress-label"><span id="recvPct">0%</span><span id="recvState">esperando datos</span></div>
+      <div class="progress-speed" id="recvSpeed"></div>
     </div>
     <a class="download-btn" id="downloadBtn" style="display:none; margin-top:16px;">
       <button class="full">Descargar archivo</button>
@@ -401,6 +428,40 @@
     statusDot.classList.toggle('live', !!on);
     statusLabel.textContent = label;
   }
+  function formatDuration(seconds) {
+    if (!isFinite(seconds) || seconds < 0) return '';
+    const s = Math.round(seconds);
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return (m > 0 ? m + 'm ' : '') + r + 's';
+  }
+  function makeSpeedTracker(el) {
+    let windowStart = performance.now();
+    let windowBytes = 0;
+    return function track(deltaBytes, doneBytes, total) {
+      windowBytes += deltaBytes;
+      const now = performance.now();
+      const elapsed = (now - windowStart) / 1000;
+      if (elapsed < 0.4 && doneBytes < total) return;
+      if (doneBytes >= total) {
+        el.textContent = '';
+      } else if (elapsed > 0) {
+        const bytesPerSec = windowBytes / elapsed;
+        const eta = bytesPerSec > 0 ? (total - doneBytes) / bytesPerSec : Infinity;
+        el.textContent = fmtBytes(bytesPerSec) + '/s · ' + formatDuration(eta) + ' restante';
+      }
+      windowStart = now;
+      windowBytes = 0;
+    };
+  }
+
+  let transferInProgress = false;
+  window.addEventListener('beforeunload', (e) => {
+    if (transferInProgress) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
 
   const themeToggle = document.getElementById('themeToggle');
   function syncThemeToggle() {
@@ -434,10 +495,14 @@
     const recvState = document.getElementById('recvState');
     const downloadBtn = document.getElementById('downloadBtn');
     const receiverStatus = document.getElementById('receiverStatus');
+    const recvSpeed = document.getElementById('recvSpeed');
 
     let meta = null;
     let received = [];
     let receivedBytes = 0;
+    let finished = false;
+    let stoppedWithMessage = false;
+    let trackRecvSpeed = null;
 
     const peer = new Peer();
     peer.on('open', () => {
@@ -449,6 +514,8 @@
       conn.on('data', (msg) => {
         if (msg && msg.type === 'meta') {
           meta = msg;
+          trackRecvSpeed = makeSpeedTracker(recvSpeed);
+          transferInProgress = true;
           recvGlyph.textContent = extGlyph(meta.name);
           recvFileName.textContent = meta.name;
           recvFileMeta.textContent = fmtBytes(meta.size);
@@ -460,8 +527,12 @@
           const pct = meta ? Math.min(100, Math.round((receivedBytes / meta.size) * 100)) : 0;
           recvFill.style.width = pct + '%';
           recvPct.textContent = pct + '%';
+          if (trackRecvSpeed && meta) trackRecvSpeed(buf.byteLength, receivedBytes, meta.size);
         } else if (msg && msg.type === 'done') {
+          finished = true;
+          transferInProgress = false;
           recvState.textContent = 'completo';
+          recvSpeed.textContent = '';
           setLive(true, 'terminado');
           const blob = new Blob(received, { type: meta.mime || 'application/octet-stream' });
           const url = URL.createObjectURL(blob);
@@ -470,7 +541,28 @@
           downloadBtn.style.display = 'block';
           receiverStatus.textContent = 'Archivo recibido completo.';
           receiverStatus.className = 'status ready';
+        } else if (msg && msg.type === 'cancel') {
+          stoppedWithMessage = true;
+          transferInProgress = false;
+          recvState.textContent = 'cancelado';
+          setLive(false, 'cancelado');
+          receiverStatus.textContent = 'El emisor canceló el envío.';
+          receiverStatus.className = 'status error';
+        } else if (msg && msg.type === 'error') {
+          stoppedWithMessage = true;
+          transferInProgress = false;
+          setLive(false, 'error');
+          receiverStatus.textContent = msg.message || 'Este enlace ya no está disponible.';
+          receiverStatus.className = 'status error';
         }
+      });
+      conn.on('close', () => {
+        if (finished || stoppedWithMessage) return;
+        transferInProgress = false;
+        recvState.textContent = 'desconectado';
+        setLive(false, 'desconectado');
+        receiverStatus.textContent = 'Se perdió la conexión con el emisor.';
+        receiverStatus.className = 'status error';
       });
       conn.on('error', (err) => {
         receiverStatus.textContent = 'Error de conexión: ' + err;
@@ -491,6 +583,7 @@
     const fileGlyph = document.getElementById('fileGlyph');
     const fileName = document.getElementById('fileName');
     const fileMeta = document.getElementById('fileMeta');
+    const cancelBtn = document.getElementById('cancelBtn');
     const shareRow = document.getElementById('shareRow');
     const qrChip = document.getElementById('qrChip');
     const linkInput = document.getElementById('linkInput');
@@ -499,12 +592,22 @@
     const sendFill = document.getElementById('sendFill');
     const sendPct = document.getElementById('sendPct');
     const sendState = document.getElementById('sendState');
+    const sendSpeed = document.getElementById('sendSpeed');
     const senderStatus = document.getElementById('senderStatus');
 
     let selectedFile = null;
     let peer = null;
+    let activeConn = null;
+    let finished = false;
+    let cancelledBySender = false;
 
     drop.addEventListener('click', () => fileInput.click());
+    drop.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
     drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('drag'); });
     drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
     drop.addEventListener('drop', (e) => {
@@ -516,12 +619,45 @@
       if (fileInput.files.length) handleFile(fileInput.files[0]);
     });
 
+    function teardownPeer() {
+      cancelledBySender = true;
+      if (peer) { peer.destroy(); peer = null; }
+      activeConn = null;
+      finished = false;
+      transferInProgress = false;
+    }
+
+    function resetSenderUI(message) {
+      selectedFile = null;
+      fileCard.classList.remove('show');
+      shareRow.classList.remove('show');
+      sendProgressWrap.classList.remove('show');
+      sendFill.style.width = '0%';
+      sendPct.textContent = '0%';
+      sendState.textContent = 'esperando destinatario';
+      sendSpeed.textContent = '';
+      fileInput.value = '';
+      setLive(false, 'listo');
+      senderStatus.textContent = message;
+      senderStatus.className = 'status';
+    }
+
+    cancelBtn.addEventListener('click', () => {
+      if (activeConn && activeConn.open) {
+        try { activeConn.send({ type: 'cancel' }); } catch (e) {}
+      }
+      teardownPeer();
+      resetSenderUI('Transferencia cancelada.');
+    });
+
     function handleFile(file) {
       if (location.protocol === 'file:') {
         senderStatus.textContent = 'Este archivo se abrió directo desde el disco (file://), así que el enlace generado no funcionaría en otro dispositivo. Sírvelo desde un servidor http/https (por ejemplo, desplegado en Vercel) y vuelve a intentarlo.';
         senderStatus.className = 'status error';
         return;
       }
+      teardownPeer();
+      cancelledBySender = false;
       selectedFile = file;
       fileCard.classList.add('show');
       fileGlyph.textContent = extGlyph(file.name);
@@ -530,7 +666,6 @@
       senderStatus.textContent = 'Creando enlace…';
       setLive(false, 'preparando');
 
-      if (peer) peer.destroy();
       peer = new Peer();
 
       peer.on('open', (id) => {
@@ -551,12 +686,39 @@
       });
 
       peer.on('connection', (conn) => {
+        if (finished) {
+          conn.on('open', () => {
+            conn.send({ type: 'error', message: 'Este enlace ya fue usado.' });
+            conn.close();
+          });
+          return;
+        }
+        if (activeConn) {
+          conn.on('open', () => {
+            conn.send({ type: 'error', message: 'Ya hay una transferencia en curso con este enlace.' });
+            conn.close();
+          });
+          return;
+        }
+
+        activeConn = conn;
+        transferInProgress = true;
         sendProgressWrap.classList.add('show');
         sendState.textContent = 'destinatario conectado';
 
         conn.on('open', () => {
           conn.send({ type: 'meta', name: selectedFile.name, size: selectedFile.size, mime: selectedFile.type });
           sendFileInChunks(conn, selectedFile);
+        });
+
+        conn.on('close', () => {
+          if (finished || cancelledBySender) return;
+          activeConn = null;
+          transferInProgress = false;
+          sendState.textContent = 'destinatario desconectado';
+          senderStatus.textContent = 'El destinatario se desconectó antes de terminar. Podés compartir el mismo enlace para reintentar.';
+          senderStatus.className = 'status error';
+          setLive(false, 'desconectado');
         });
       });
 
@@ -583,6 +745,7 @@
         });
       }
 
+      const trackSendSpeed = makeSpeedTracker(sendSpeed);
       let offset = 0;
       const reader = new FileReader();
 
@@ -600,11 +763,14 @@
           sendFill.style.width = pct + '%';
           sendPct.textContent = pct + '%';
           sendState.textContent = 'enviando';
+          trackSendSpeed(chunk.byteLength, offset, file.size);
 
           if (offset < file.size) {
             readNext();
           } else {
             conn.send({ type: 'done' });
+            finished = true;
+            transferInProgress = false;
             sendState.textContent = 'completado';
             setLive(true, 'completado');
             senderStatus.textContent = 'Entrega completa.';
