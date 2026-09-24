@@ -9,6 +9,12 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-09-24
+
+### Fixed
+- La fuente 'Pixelify Sans' renderizaba mal la ligadura "fi" en algunos dispositivos (ej. "file" se veía como "Ale", "first" como "Arst"). Se desactivan las ligaduras tipográficas en toda la app.
+- El modal de ayuda y el cartel de actualización no respetaban el área segura del dispositivo (notch, barra de estado en PWA instalada): el modal podía quedar pegado contra la barra de estado. Ahora ambos usan el mismo padding con `env(safe-area-inset-*)` que ya usa el resto de la app, y el alto máximo del modal se recalcula para no desbordar en pantallas chicas.
+
 ## [0.10.1] - 2026-09-24
 
 ### Fixed
@@ -153,7 +159,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.10.2...HEAD
+[0.10.2]: https://github.com/rzazo24/filerz/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/rzazo24/filerz/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/rzazo24/filerz/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/rzazo24/filerz/compare/v0.9.0...v0.9.1
