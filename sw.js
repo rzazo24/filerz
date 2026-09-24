@@ -1,4 +1,4 @@
-const CACHE_NAME = 'filerz-shell-v1';
+const CACHE_NAME = 'filerz-shell-v2';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -11,7 +11,14 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_ASSETS))
   );
-  self.skipWaiting();
+  // sin skipWaiting(): el worker nuevo queda en "waiting" hasta que la página
+  // pida activarlo (después de que el usuario confirme la recarga)
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (event) => {
