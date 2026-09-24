@@ -9,6 +9,12 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-09-24
+
+### Fixed
+- El aviso de "hay una actualización disponible" nunca aparecía: el navegador solo detecta una versión nueva del service worker cuando el archivo `sw.js` cambia de bytes, y no se había vuelto a tocar desde que se implementó el aviso, pese a varios deploys posteriores que sí cambiaron `index.html`. Se sube el número de versión del caché (ahora `filerz-shell-v3`) y se deja un comentario en `sw.js` recordando subirlo en cada deploy que cambie el shell (`index.html`, `manifest.json` o los íconos), que es lo único que dispara la detección.
+- Se agrega `vercel.json` forzando `Cache-Control: no-cache` en `/sw.js`, para que el navegador siempre revalide ese archivo contra el servidor en vez de servir una copia cacheada por HTTP, que también podría ocultar una actualización real.
+
 ## [0.8.2] - 2026-09-24
 
 ### Changed
@@ -117,7 +123,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.2...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.3...HEAD
+[0.8.3]: https://github.com/rzazo24/filerz/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/rzazo24/filerz/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/rzazo24/filerz/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/rzazo24/filerz/compare/v0.7.0...v0.8.0
