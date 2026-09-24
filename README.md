@@ -17,7 +17,7 @@ Todo vive en un único archivo HTML autocontenido (`index.html`), sin paso de bu
 
 - **[PeerJS](https://peerjs.com/)** envuelve WebRTC y resuelve la señalización inicial (el intercambio de SDP/ICE necesario para que los dos navegadores se encuentren) usando el broker público de **PeerJS Cloud**. Una vez establecida la conexión, los datos ya no pasan por ese broker.
 - **[qrcodejs](https://github.com/davidshimjs/qrcodejs)** genera el QR con el enlace de la sesión.
-- El archivo se envía en fragmentos de 16 KB por el canal de datos, y el receptor los va reensamblando en memoria hasta poder generar el `Blob` final para descargar.
+- El archivo se envía en fragmentos de 16 KB por el canal de datos, con control de flujo para no saturar el buffer de salida. Para archivos de más de 200 MB en navegadores compatibles (Chrome/Edge de escritorio), el receptor escribe directo a disco con la File System Access API; en el resto de los casos, los fragmentos se reensamblan en memoria hasta generar el `Blob` final para descargar.
 
 Ambas librerías se cargan por CDN (jsDelivr / cdnjs), así que el sitio se puede servir tal cual, sin `npm install` ni bundlers.
 
@@ -42,6 +42,7 @@ Pensado para desplegarse como sitio estático en **Vercel**: no hace falta build
 
 - La señalización usa el broker público de PeerJS Cloud. Si en algún momento hace falta más control (privacidad, límites de uso), se puede levantar un [PeerServer](https://github.com/peers/peerjs-server) propio.
 - Sin backend propio, sin base de datos, sin analítica: el archivo no toca ningún servidor intermedio.
+- Solo se usa STUN público (sin TURN): en redes muy restrictivas (NAT simétrico, firewalls corporativos) la conexión directa puede fallar. Agregar TURN evitaría eso, pero implicaría que el archivo pase por un relay de terceros en esos casos, lo cual choca con la idea de "nunca pasa por un servidor intermedio" — por eso, a propósito, no está incluido.
 
 ## Licencia
 
