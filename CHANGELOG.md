@@ -7,6 +7,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-09-24
+
+### Added
+- Favicon: una "F" pixel-art en la paleta del sitio, como SVG embebido en base64 dentro del propio `index.html` (sin archivos adicionales).
+
 ## [0.2.5] - 2026-09-24
 
 ### Fixed
@@ -46,7 +51,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.5...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.2.6...HEAD
+[0.2.6]: https://github.com/rzazo24/filerz/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/rzazo24/filerz/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/rzazo24/filerz/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/rzazo24/filerz/compare/v0.2.2...v0.2.3
