@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-09-24
+
+### Fixed
+- Los botones del encabezado (ayuda, idioma, tema, estado) se desbordaban del borde de la tarjeta en pantallas angostas, sobre todo instalado como PWA en el celular. Ahora el encabezado permite que "Filerz" y los botones pasen a una segunda línea alineada a la derecha cuando no entran en una sola, en vez de recortarse fuera de la tarjeta.
+
 ## [0.8.0] - 2026-09-24
 
 ### Added
@@ -107,7 +112,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/rzazo24/filerz/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/rzazo24/filerz/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/rzazo24/filerz/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/rzazo24/filerz/compare/v0.6.0...v0.6.1
