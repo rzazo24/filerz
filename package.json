@@ -6,7 +6,8 @@
   "scripts": {
     "test:unit": "node --test tests/unit/*.test.mjs",
     "test:e2e": "playwright test",
-    "test": "npm run test:unit && npm run test:e2e"
+    "test": "npm run test:unit && npm run test:e2e",
+    "update-sw-cache": "node scripts/update-sw-cache-name.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

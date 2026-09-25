@@ -36,3 +36,27 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  update-sw-cache:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Recalcular CACHE_NAME si cambió el shell
+        run: |
+          node scripts/update-sw-cache-name.mjs
+          if ! git diff --quiet -- sw.js; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add sw.js
+            git commit -m "chore: actualizar CACHE_NAME del service worker [skip ci]"
+            git push
+          fi

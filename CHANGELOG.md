@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-09-25
+
+### Changed
+- `CACHE_NAME` del service worker dejó de ser un número que había que subir a mano en cada deploy: ahora es un hash SHA-256 del contenido real de los archivos del shell (`scripts/update-sw-cache-name.mjs`), recalculado automáticamente por un nuevo job de CI (`update-sw-cache`) en cada push a `main`, que commitea el resultado solo si el shell cambió de verdad. Elimina el riesgo de que alguien se olvide de bumpearlo y el aviso de actualización de la PWA deje de aparecer.
+
 ## [0.13.0] - 2026-09-25
 
 ### Added
@@ -207,7 +212,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/rzazo24/filerz/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/rzazo24/filerz/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/rzazo24/filerz/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/rzazo24/filerz/compare/v0.11.2...v0.12.0

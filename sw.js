@@ -1,7 +1,10 @@
-// Subir este número en cada deploy que cambie index.html, manifest.json o los
-// íconos: es lo único que hace que el navegador detecte una versión nueva del
-// service worker y dispare el aviso de "recargar para actualizar" en la app.
-const CACHE_NAME = 'filerz-shell-v15';
+// CACHE_NAME se genera automáticamente con un hash del contenido de
+// SHELL_ASSETS (ver scripts/update-sw-cache-name.mjs, que corre en CI en cada
+// push a main). No lo edites a mano: un push que cambie el shell sin pasar
+// por ese script lo va a pisar en el próximo run de CI de todos modos. Es lo
+// único que hace que el navegador detecte una versión nueva del service
+// worker y dispare el aviso de "recargar para actualizar" en la app.
+const CACHE_NAME = 'filerz-shell-dd9274c81349';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
