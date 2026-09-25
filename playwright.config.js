@@ -16,5 +16,8 @@ export default defineConfig({
     // navigator.language si no hay nada en localStorage, así que sin esto los
     // tests dependerían del locale de la máquina que los corre.
     locale: 'es-ES',
+    // Para poder debuggear fallos en CI sin acceso directo al navegador.
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
 });

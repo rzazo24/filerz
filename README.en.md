@@ -5,6 +5,7 @@
 Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file travels straight from one browser to another over WebRTC, never uploaded to any server of ours.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/rzazo24/filerz)
+[![Tests](https://github.com/rzazo24/filerz/actions/workflows/test.yml/badge.svg)](https://github.com/rzazo24/filerz/actions/workflows/test.yml)
 
 ![Filerz screenshot: sender screen with the chosen file, the link and the QR code](screenshots/sender-en.png)
 
@@ -60,6 +61,8 @@ npm run test:e2e  # Playwright only (spins up its own local server)
 ```
 
 Unit tests (`tests/unit/`) cover pure functions (short-ID generation, parsing a pasted code/URL, ES/EN key parity) by extracting them straight from `index.html`. End-to-end tests (`tests/e2e/`) use Playwright: they run the full sender→recipient flow against the real PeerJS Cloud broker, decode the generated QR to confirm it points at the right link, and check for horizontal overflow in the mobile layout.
+
+A GitHub Actions workflow (`.github/workflows/test.yml`) runs the whole suite on every push to `main` and on every pull request.
 
 ## Deploy
 

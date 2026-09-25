@@ -9,6 +9,12 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-25
+
+### Added
+- Workflow de GitHub Actions (`.github/workflows/test.yml`) que corre la suite de tests (unitarios + Playwright) en cada push a `main` y en cada pull request, con badge en el README.
+- `playwright.config.js` graba trace y screenshot al fallar un test, y el workflow sube el reporte de Playwright como artifact cuando falla, para poder debuggear un fallo de CI sin tener que reproducirlo en local.
+
 ## [0.12.1] - 2026-09-24
 
 ### Fixed
@@ -201,7 +207,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/rzazo24/filerz/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/rzazo24/filerz/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/rzazo24/filerz/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/rzazo24/filerz/compare/v0.11.1...v0.11.2
