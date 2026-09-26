@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.2] - 2026-09-26
+
+### Changed
+- El modal de ayuda (y el de escanear QR, que comparte la misma clase) pasa de 440px a 560px de ancho máximo, para quedar consistente con el nuevo ancho de la tarjeta principal en pantallas grandes.
+
 ## [0.14.1] - 2026-09-26
 
 ### Changed
@@ -217,7 +222,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.14.1...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.14.2...HEAD
+[0.14.2]: https://github.com/rzazo24/filerz/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/rzazo24/filerz/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/rzazo24/filerz/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/rzazo24/filerz/compare/v0.12.1...v0.13.0
