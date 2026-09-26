@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-09-26
+
+### Changed
+- La tarjeta principal es un poco más ancha en pantallas grandes (`max-width` de 460px a 560px), para aprovechar mejor el espacio en PC. Sin cambios en móvil, donde el ancho ya estaba limitado por la pantalla.
+
 ## [0.14.0] - 2026-09-25
 
 ### Changed
@@ -212,7 +217,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.14.1...HEAD
+[0.14.1]: https://github.com/rzazo24/filerz/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/rzazo24/filerz/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/rzazo24/filerz/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/rzazo24/filerz/compare/v0.12.0...v0.12.1
