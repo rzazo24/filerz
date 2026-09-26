@@ -1,3 +1,6 @@
 tests/
 playwright.config.js
 CLAUDE.md
+.claude/
+.github/
+scripts/
