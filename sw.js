@@ -4,7 +4,7 @@
 // por ese script lo va a pisar en el próximo run de CI de todos modos. Es lo
 // único que hace que el navegador detecte una versión nueva del service
 // worker y dispare el aviso de "recargar para actualizar" en la app.
-const CACHE_NAME = 'filerz-shell-0c73dbbd4ba5';
+const CACHE_NAME = 'filerz-shell-2ef45c8bc85d';
 const SHELL_ASSETS = [
   '/',
   '/index.html',

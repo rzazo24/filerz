@@ -504,6 +504,30 @@
   }
   .modal-repo a { color: var(--accent); }
 
+  /* Scrollbars pixel-art (página y modales). Solo con puntero fino: en móvil
+     los scrollbars son overlay y personalizarlos puede reservar ancho de más. */
+  @media (hover: hover) and (pointer: fine) {
+    html::-webkit-scrollbar, .modal::-webkit-scrollbar { width: 16px; height: 16px; }
+    html::-webkit-scrollbar-track, .modal::-webkit-scrollbar-track {
+      background: var(--surface-2);
+      border-left: 3px solid var(--line);
+    }
+    html::-webkit-scrollbar-thumb, .modal::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border: 3px solid var(--line);
+    }
+    html::-webkit-scrollbar-thumb:hover, .modal::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+    html::-webkit-scrollbar-corner, .modal::-webkit-scrollbar-corner { background: var(--surface-2); }
+
+    /* Firefox no soporta ::-webkit-scrollbar: se aproxima con las propiedades estándar. */
+    @supports not selector(::-webkit-scrollbar) {
+      html, .modal {
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) var(--surface-2);
+      }
+    }
+  }
+
   @media (max-width: 480px) {
     .share { flex-direction: column; align-items: flex-start; }
     .top h1 { font-size: 17px; }

@@ -9,6 +9,11 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.14.3] - 2026-09-29
+
+### Changed
+- Los scrollbars de la página y de los modales (ayuda, escanear QR) siguen el diseño pixel-art de la app: pulgar cuadrado con relleno del color de acento y borde grueso, pista con el color de superficie, en ambos temas. Solo aplica con puntero fino (PC); en móvil los scrollbars overlay quedan como están para no reservar ancho de más. Firefox, que no soporta `::-webkit-scrollbar`, recibe la aproximación con `scrollbar-color`/`scrollbar-width`.
+
 ## [0.14.2] - 2026-09-26
 
 ### Changed
@@ -222,7 +227,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.14.2...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.14.3...HEAD
+[0.14.3]: https://github.com/rzazo24/filerz/compare/v0.14.2...v0.14.3
 [0.14.2]: https://github.com/rzazo24/filerz/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/rzazo24/filerz/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/rzazo24/filerz/compare/v0.13.0...v0.14.0
