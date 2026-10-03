@@ -47,6 +47,16 @@ the next push's CI run anyway. If you need to force a cache-bust locally to
 test something, run `npm run update-sw-cache` and let it compute the real
 value.
 
+**A deployed fix does not reach open or installed clients immediately.** The
+service worker serves the cached shell first, and a new version only takes over
+once the user accepts the "new version" toast or fully restarts the
+browser/app. So when someone reports "it still fails after the fix", first
+confirm they are really on the new version — have them look for a visible
+string that changed in that release (for example the drop-zone subtitle) —
+before debugging further. This is exactly what happened with the TURN fix: an
+iPhone kept running the old cached shell until the browser was fully
+restarted, which looked like the fix hadn't worked.
+
 ## The `vercel.json` `buildCommand` trap (broke production once)
 
 `vercel.json` overrides `installCommand` to a no-op:
