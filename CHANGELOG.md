@@ -9,6 +9,18 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-03
+
+### Fixed
+- Las transferencias fallaban cuando alguno de los dos dispositivos estaba en una red que no permite conexión directa (por ejemplo, un iPhone con datos móviles). `new Peer()` sin opciones usaba el TURN público por defecto de PeerJS, cuyos hostnames (`eu-0`/`us-0.turn.peerjs.com`) ya no resuelven en DNS, así que no había ningún relay de respaldo y la conexión fallaba sin avisar.
+
+### Added
+- Relay TURN propio (coturn en un VPS) como respaldo cuando la conexión directa no es posible. `index.html` define `PEER_OPTIONS` (STUN de Google + el TURN propio por UDP y TCP) y se lo pasa a todos los `new Peer(...)`. El relay solo retransmite bytes cifrados con DTLS y no guarda nada; tiene cuotas de uso y bloquea rangos privados para que la credencial, que es pública por diseño, no sirva para alcanzar redes internas.
+- Tests unitarios que protegen la config ICE: que incluya STUN y TURN con credenciales (UDP y TCP), que no dependa del TURN de PeerJS y que ningún `new Peer(...)` se cree sin `PEER_OPTIONS`.
+
+### Changed
+- Los textos que decían que el archivo "nunca pasa por ningún servidor" se corrigen en la app (subtítulo y ayuda), el manifest y los README, porque con un relay propio ya no es literalmente cierto: ahora dicen que no se guarda en ningún servidor y que, si la red no permite la conexión directa, se retransmite cifrado por un relay propio.
+
 ## [0.14.3] - 2026-09-29
 
 ### Changed
@@ -227,7 +239,8 @@ y este proyecto usa [Versionado Semántico](https://semver.org/lang/es/).
 - Generación de enlace de un solo uso y código QR (qrcodejs) para compartir la sesión.
 - Barra de progreso en tiempo real tanto en el emisor como en el receptor.
 
-[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.14.3...HEAD
+[Unreleased]: https://github.com/rzazo24/filerz/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/rzazo24/filerz/compare/v0.14.3...v0.15.0
 [0.14.3]: https://github.com/rzazo24/filerz/compare/v0.14.2...v0.14.3
 [0.14.2]: https://github.com/rzazo24/filerz/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/rzazo24/filerz/compare/v0.14.0...v0.14.1

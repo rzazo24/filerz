@@ -79,3 +79,39 @@ describe('normalizeCode', () => {
     assert.equal(normalizeCode(null), '');
   });
 });
+
+describe('PEER_OPTIONS (config ICE)', () => {
+  const src = extract('const PEER_OPTIONS = {', '\n  const params = new URLSearchParams');
+  const { PEER_OPTIONS } = new Function(`${src}\n  return { PEER_OPTIONS };`)();
+  const servers = PEER_OPTIONS.config.iceServers;
+  const urls = servers.flatMap((s) => [].concat(s.urls));
+
+  // Regresión: sin config propia, PeerJS cae en su TURN público por defecto,
+  // cuyos hostnames ya no resuelven; las conexiones entre redes restrictivas
+  // (p. ej. iPhone con datos móviles) fallaban sin ningún aviso.
+  test('incluye un STUN y un TURN propio con credenciales', () => {
+    assert.ok(urls.some((u) => u.startsWith('stun:')), 'falta un servidor STUN');
+    const turn = servers.find((s) => [].concat(s.urls).some((u) => u.startsWith('turn:')));
+    assert.ok(turn, 'falta un servidor TURN');
+    assert.ok(turn.username && turn.credential, 'el TURN necesita username y credential');
+  });
+
+  test('el TURN ofrece UDP y TCP (TCP sirve cuando una red bloquea UDP)', () => {
+    assert.ok(urls.some((u) => u.startsWith('turn:') && u.includes('transport=udp')));
+    assert.ok(urls.some((u) => u.startsWith('turn:') && u.includes('transport=tcp')));
+  });
+
+  test('no depende del TURN público de PeerJS (ya no existe)', () => {
+    assert.ok(!urls.some((u) => u.includes('peerjs.com')));
+  });
+});
+
+describe('Peer() recibe PEER_OPTIONS', () => {
+  test('ningún new Peer(...) usa la config por defecto de PeerJS', () => {
+    const calls = html.match(/new Peer\(.*\)/g) || [];
+    assert.ok(calls.length >= 2, 'se esperaban al menos 2 llamadas a new Peer(');
+    for (const call of calls) {
+      assert.ok(call.includes('PEER_OPTIONS'), `${call} no pasa PEER_OPTIONS`);
+    }
+  });
+});

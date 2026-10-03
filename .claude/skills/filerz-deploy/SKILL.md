@@ -1,6 +1,6 @@
 ---
 name: filerz-deploy
-description: CI/CD and deployment internals for Filerz — the GitHub Actions workflow, vercel.json, the service worker's CACHE_NAME automation, .vercelignore, and the changelog/git-tag release convention. Use this whenever touching .github/workflows/test.yml, vercel.json, sw.js, .vercelignore, or manifest.json, whenever cutting a version tag, or whenever a Vercel deploy fails or behaves unexpectedly. This repo has broken production twice before from exactly this kind of config change — read this before editing any of these files, not after something breaks.
+description: CI/CD, deployment and relay-server internals for Filerz — the GitHub Actions workflow, vercel.json, the service worker's CACHE_NAME automation, .vercelignore, the self-hosted TURN relay (coturn) and the ICE config (PEER_OPTIONS), and the changelog/git-tag release convention. Use this whenever touching the TURN server, PEER_OPTIONS/iceServers, or a transfer that fails between networks (e.g. iPhone on mobile data), and whenever touching .github/workflows/test.yml, vercel.json, sw.js, .vercelignore, or manifest.json, whenever cutting a version tag, or whenever a Vercel deploy fails or behaves unexpectedly. This repo has broken production twice before from exactly this kind of config change — read this before editing any of these files, not after something breaks.
 ---
 
 # Deploying and releasing Filerz
@@ -100,6 +100,57 @@ remember the root path depends on that exact name.
 so browsers always revalidate that one file against the server instead of
 serving an HTTP-cached copy — which could otherwise mask a real update
 independently of the `CACHE_NAME` mechanism above.
+
+## TURN relay (coturn) and `PEER_OPTIONS`
+
+WebRTC only connects two browsers directly when their NATs allow it. A phone on
+mobile data (CGNAT / symmetric NAT) usually can't, so there has to be a TURN
+relay to fall back to. PeerJS used to supply one by default
+(`turn:eu-0.turn.peerjs.com` / `us-0.turn.peerjs.com`), but those hostnames no
+longer resolve, so `new Peer()` with no options silently had *no* relay and
+transfers between restrictive networks just failed. The app now passes its own
+ICE servers — `PEER_OPTIONS` in `index.html` (Google STUN + our TURN over UDP
+and TCP) — to **every** `new Peer(...)`; a unit test fails if one is added
+without it. The relay only forwards DTLS-encrypted bytes and stores nothing.
+
+The relay is `coturn` on the author's VPS (public IP `51.170.39.249`, the one in
+`PEER_OPTIONS`). Things that are easy to get wrong:
+
+- **Config lives on the server**, in `/etc/turnserver.conf` (`root:turnserver`,
+  mode 640; original saved as `turnserver.conf.orig`). The VM sits behind a 1:1
+  NAT, so it needs `external-ip=<public>/<private>`, plus `listening-ip` /
+  `relay-ip` set to the private address.
+- **Two firewall layers must both allow it**: `iptables` on the machine (rules
+  are persisted with `netfilter-persistent`; a backup of the original is at
+  `/etc/iptables/rules.v4.bak-antes-de-turn`) *and* the ingress rules in the
+  cloud provider's network (Oracle VCN Security List or NSG). Open **UDP 3478,
+  TCP 3478, and UDP 49152-49251** (the relay range, `min-port`/`max-port`). If
+  packets never arrive, the `iptables -L INPUT -v -n` counters for those rules
+  stay at 0 — that points at the cloud-side rules, not the machine.
+- **The credential is public on purpose** (static, in `index.html`) because
+  there is no backend to mint short-lived ones. So the config limits abuse:
+  `user-quota` / `total-quota` / `max-bps` / `bps-capacity`, and above all
+  `denied-peer-ip` for private, CGNAT/tailnet, loopback, link-local and
+  multicast ranges. That last one is a security control, not tuning: the
+  machine also runs private services, and without it anyone who reads the
+  password out of the page could relay traffic into them. Don't remove it.
+- **Rotating the credential**: change the `user=filerz:...` line in
+  `/etc/turnserver.conf`, `systemctl restart coturn`, and change
+  `PEER_OPTIONS` in the same deploy. Clients still running a cached older
+  version of the app (the PWA service worker serves the shell from cache) keep
+  the old credential until they update, so expect those to lose the relay
+  briefly.
+
+To check the relay end to end without a second device, create an
+`RTCPeerConnection` with only our TURN and `iceTransportPolicy: 'relay'`: it
+should gather a `relay` candidate on `51.170.39.249` with a port inside the
+open range (no relay candidate and error 701 means the server is unreachable).
+To check the *app* uses it, wrap `window.RTCPeerConnection` in an init script to
+force `iceTransportPolicy: 'relay'` and run a real transfer — it only completes
+if the data goes through the TURN. Note PeerJS creates one throwaway
+`RTCPeerConnection` at load for capability detection using its own default
+config (including the dead hostnames); the real connection is the second one,
+so don't read the first config and conclude `PEER_OPTIONS` isn't applied.
 
 ## Versioning: a tag per change, on the merge commit
 

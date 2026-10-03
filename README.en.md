@@ -2,7 +2,7 @@
 
 **English** | [Español](README.md)
 
-Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file travels straight from one browser to another over WebRTC, never uploaded to any server of ours.
+Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file travels encrypted from one browser to another over WebRTC and is never stored on any server.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/rzazo24/filerz)
 [![Tests](https://github.com/rzazo24/filerz/actions/workflows/test.yml/badge.svg)](https://github.com/rzazo24/filerz/actions/workflows/test.yml)
@@ -17,7 +17,7 @@ Peer-to-peer file transfer, [file.pizza](https://file.pizza)-style: the file tra
 - A progress bar on both sides, with **transfer speed and estimated time left**, while the copy is running.
 - A **cancel** button to stop the transfer at any point and pick another file. If the recipient disconnects mid-transfer, you can retry by sharing the same link: it only stops working once the transfer actually completes.
 - Once the transfer finishes, a **Reload** button appears on both sides: on the sender it goes back to the file-picker screen, and on the recipient it clears the link from the URL before reloading, so it doesn't retry connecting to a link that's already been used.
-- The file never touches a backend: it travels directly between the two browsers over an `RTCDataChannel`.
+- The file isn't stored on any backend: it travels directly between the two browsers over an `RTCDataChannel` or, if the network doesn't allow a direct connection (for example, on mobile data), through a TURN relay of ours that only sees encrypted data.
 - **Light/dark theme** with a dedicated toggle, and a keyboard-accessible drop zone.
 - It's an **installable PWA**: you can add it to your home screen (or install it as a desktop app), the interface loads instantly thanks to the service worker (even offline), and it shows a banner to reload when a new version is available.
 - A **help** button (`?`) with usage instructions and a link to this repository.
@@ -73,8 +73,8 @@ For **Vercel Analytics** to start collecting data, you need to enable "Web Analy
 ## Notes
 
 - Signaling uses the public PeerJS Cloud broker. If more control is ever needed (privacy, usage limits), a self-hosted [PeerServer](https://github.com/peers/peerjs-server) can be set up.
-- No backend or database of our own: the file never touches an intermediate server. [Vercel Analytics](https://vercel.com/docs/analytics) is used (visits and page views, no cookies or personal data) to know whether anyone's using the app — it only activates if Web Analytics is enabled for the project on Vercel; otherwise, the script simply loads nothing.
-- Only public STUN is used (no TURN): on very restrictive networks (symmetric NAT, corporate firewalls), the direct connection can fail. Adding TURN would fix that, but it would mean the file passes through a third-party relay in those cases, which clashes with the idea that it "never passes through an intermediate server" — so, on purpose, it isn't included.
+- No backend or database of our own: the file isn't stored on any server. [Vercel Analytics](https://vercel.com/docs/analytics) is used (visits and page views, no cookies or personal data) to know whether anyone's using the app — it only activates if Web Analytics is enabled for the project on Vercel; otherwise, the script simply loads nothing.
+- When WebRTC can't establish a direct connection (symmetric NAT, mobile data behind CGNAT, corporate firewalls), the app uses a **TURN relay of our own** ([coturn](https://github.com/coturn/coturn) on the author's VPS). The relay only forwards DTLS-encrypted bytes — it can't read the file — and stores nothing. Since there's no backend to sign credentials, the relay's username and password are public in `index.html`; abuse is limited with usage quotas and by blocking its use to reach private networks. PeerJS's public TURN used to be the fallback, but it no longer exists (its hostnames don't resolve), which is why connections across restrictive networks were failing.
 
 ## License
 

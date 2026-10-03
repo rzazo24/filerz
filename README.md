@@ -2,7 +2,7 @@
 
 [English](README.en.md) | **Español**
 
-Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizza): el archivo viaja directo de un navegador a otro por WebRTC, sin subirse nunca a ningún servidor propio.
+Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizza): el archivo viaja cifrado de un navegador a otro por WebRTC y no se guarda nunca en ningún servidor.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/rzazo24/filerz)
 [![Tests](https://github.com/rzazo24/filerz/actions/workflows/test.yml/badge.svg)](https://github.com/rzazo24/filerz/actions/workflows/test.yml)
@@ -17,7 +17,7 @@ Transferencia de archivos peer-to-peer, al estilo [file.pizza](https://file.pizz
 - Barra de progreso en ambos lados, con **velocidad y tiempo restante estimado**, mientras dura la copia.
 - Botón para **cancelar** la transferencia en cualquier momento y elegir otro archivo. Si el receptor se desconecta a mitad de la copia, se puede reintentar compartiendo el mismo enlace: deja de funcionar recién cuando se completa con éxito.
 - Al completarse la transferencia aparece un botón **Recargar** en ambos lados: en el emisor vuelve a la pantalla de elegir archivo, y en el receptor limpia el enlace de la URL antes de recargar, para no reintentar conectarse a un enlace que ya se usó.
-- El archivo nunca pasa por un backend: viaja directo entre los dos navegadores por un `RTCDataChannel`.
+- El archivo no se guarda en ningún backend: viaja directo entre los dos navegadores por un `RTCDataChannel` o, si la red no permite la conexión directa (por ejemplo, con datos móviles), a través de un relay TURN propio que solo ve datos cifrados.
 - **Tema claro/oscuro** con botón dedicado, y drop-zone accesible por teclado.
 - Es una **PWA instalable**: se puede agregar a la pantalla de inicio (o instalar como app de escritorio), la interfaz carga al instante gracias al service worker (incluso sin conexión), y avisa con un cartel cuando hay una versión nueva para recargarla.
 - Botón de **ayuda** (`?`) con instrucciones de uso y el link a este repositorio.
@@ -73,8 +73,8 @@ Para que **Vercel Analytics** empiece a recolectar datos, hay que habilitar "Web
 ## Notas
 
 - La señalización usa el broker público de PeerJS Cloud. Si en algún momento hace falta más control (privacidad, límites de uso), se puede levantar un [PeerServer](https://github.com/peers/peerjs-server) propio.
-- Sin backend propio ni base de datos: el archivo no toca ningún servidor intermedio. Sí se usa [Vercel Analytics](https://vercel.com/docs/analytics) (visitas y páginas vistas, sin cookies ni datos personales) para saber si alguien usa la app — se activa solo si el proyecto tiene Web Analytics habilitado en Vercel; si no, el script simplemente no carga nada.
-- Solo se usa STUN público (sin TURN): en redes muy restrictivas (NAT simétrico, firewalls corporativos) la conexión directa puede fallar. Agregar TURN evitaría eso, pero implicaría que el archivo pase por un relay de terceros en esos casos, lo cual choca con la idea de "nunca pasa por un servidor intermedio" — por eso, a propósito, no está incluido.
+- Sin backend propio ni base de datos: el archivo no se almacena en ningún servidor. Sí se usa [Vercel Analytics](https://vercel.com/docs/analytics) (visitas y páginas vistas, sin cookies ni datos personales) para saber si alguien usa la app — se activa solo si el proyecto tiene Web Analytics habilitado en Vercel; si no, el script simplemente no carga nada.
+- Cuando WebRTC no logra una conexión directa (NAT simétrico, datos móviles con CGNAT, firewalls corporativos), la app usa un **relay TURN propio** ([coturn](https://github.com/coturn/coturn) en un VPS del autor). El relay solo retransmite bytes cifrados con DTLS —no puede leer el archivo— y no guarda nada. Como no hay backend que firme credenciales, el usuario y la contraseña del relay son públicos en `index.html`; el abuso se limita con cuotas de uso y bloqueando que se use para alcanzar redes privadas. Antes se usaba el TURN público de PeerJS, que dejó de existir (sus hostnames ya no resuelven), y por eso las conexiones entre redes restrictivas fallaban.
 
 ## Licencia
 

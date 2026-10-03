@@ -579,7 +579,7 @@
   <div id="senderView">
     <div class="drop" id="drop" role="button" tabindex="0" aria-label="Elegir un archivo para enviar" data-i18n-label="dropAriaLabel">
       <p data-i18n="dropTitle">Suelta un archivo aquí o toca para elegirlo</p>
-      <small data-i18n="dropSubtitle">Viaja directo al otro navegador, sin pasar por ningún servidor</small>
+      <small data-i18n="dropSubtitle">Viaja directo al otro navegador, sin guardarse en ningún servidor</small>
     </div>
     <input type="file" id="fileInput">
 
@@ -674,7 +674,7 @@
       <p data-i18n="helpReceiveBody">Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo. Si no tienes el enlace a mano, en la pantalla principal puedes escribir el código o escanear el QR con el botón dedicado.</p>
       <h3 data-i18n="helpNotesHeading">A tener en cuenta</h3>
       <ul>
-        <li data-i18n="helpNote1">El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.</li>
+        <li data-i18n="helpNote1">El archivo viaja cifrado entre los dos navegadores por WebRTC y no se guarda en ningún servidor. Si la red no permite la conexión directa (por ejemplo, con datos móviles), se retransmite por un relay propio que solo ve datos cifrados.</li>
         <li data-i18n="helpNote2">Ambas pestañas deben quedar abiertas mientras dura la copia.</li>
         <li data-i18n="helpNote3">El enlace es de un solo uso: una vez completada la transferencia, deja de funcionar.</li>
         <li data-i18n="helpNote4">Si la conexión se corta a mitad de la copia, puedes compartir el mismo enlace de nuevo para reintentar.</li>
@@ -706,6 +706,16 @@
   const CHUNK_SIZE = 16 * 1024;
   const STREAM_TO_DISK_THRESHOLD = 200 * 1024 * 1024; // por encima de esto, se prefiere escribir a disco en vez de acumular en RAM
   const supportsFsAccess = 'showSaveFilePicker' in window;
+  // Sin esto, PeerJS usa su TURN público por defecto, que ya no existe (sus hostnames no resuelven).
+  // La credencial es pública a propósito (no hay backend); el abuso se limita con cuotas y denied-peer-ip en coturn.
+  const PEER_OPTIONS = {
+    config: {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: ['turn:51.170.39.249:3478?transport=udp', 'turn:51.170.39.249:3478?transport=tcp'], username: 'filerz', credential: '0e3c0fcc37bf3661045ec60d' },
+      ],
+    },
+  };
   const params = new URLSearchParams(location.hash.slice(1));
   const receiveId = params.get('r');
 
@@ -715,7 +725,7 @@
       helpAriaLabel: 'Ayuda',
       dropAriaLabel: 'Elegir un archivo para enviar',
       dropTitle: 'Suelta un archivo aquí o toca para elegirlo',
-      dropSubtitle: 'Viaja directo al otro navegador, sin pasar por ningún servidor',
+      dropSubtitle: 'Viaja directo al otro navegador, sin guardarse en ningún servidor',
       cancelAriaLabel: 'Cancelar y elegir otro archivo',
       shareHint: 'Escanea o comparte el enlace',
       copyBtn: 'Copiar',
@@ -740,7 +750,7 @@
       helpReceiveHeading: 'Recibir un archivo',
       helpReceiveBody: 'Abre el enlace (o escanea el QR) y la descarga arranca sola. Si el archivo es grande y tu navegador lo permite, primero te pedirá dónde guardarlo. Si no tienes el enlace a mano, en la pantalla principal puedes escribir el código o escanear el QR con el botón dedicado.',
       helpNotesHeading: 'A tener en cuenta',
-      helpNote1: 'El archivo viaja directo entre los dos navegadores por WebRTC: nunca pasa por un servidor propio.',
+      helpNote1: 'El archivo viaja cifrado entre los dos navegadores por WebRTC y no se guarda en ningún servidor. Si la red no permite la conexión directa (por ejemplo, con datos móviles), se retransmite por un relay propio que solo ve datos cifrados.',
       helpNote2: 'Ambas pestañas deben quedar abiertas mientras dura la copia.',
       helpNote3: 'El enlace es de un solo uso: una vez completada la transferencia, deja de funcionar.',
       helpNote4: 'Si la conexión se corta a mitad de la copia, puedes compartir el mismo enlace de nuevo para reintentar.',
@@ -804,7 +814,7 @@
       helpAriaLabel: 'Help',
       dropAriaLabel: 'Choose a file to send',
       dropTitle: 'Drop a file here or tap to choose one',
-      dropSubtitle: 'Goes straight to the other browser, no server in between',
+      dropSubtitle: 'Goes straight to the other browser, nothing is stored on any server',
       cancelAriaLabel: 'Cancel and choose another file',
       shareHint: 'Scan or share the link',
       copyBtn: 'Copy',
@@ -829,7 +839,7 @@
       helpReceiveHeading: 'Receiving a file',
       helpReceiveBody: "Open the link (or scan the QR code) and the download starts on its own. If the file is large and your browser supports it, it'll first ask where to save it. If you don't have the link handy, on the main screen you can type the code or scan the QR with the dedicated button.",
       helpNotesHeading: 'Good to know',
-      helpNote1: 'The file travels directly between the two browsers over WebRTC: it never touches a server of ours.',
+      helpNote1: "The file travels encrypted between the two browsers over WebRTC and is never stored on any server. If the network doesn't allow a direct connection (for example, on mobile data), it's relayed through a relay of ours that only sees encrypted data.",
       helpNote2: 'Both tabs need to stay open for the whole transfer.',
       helpNote3: "The link is one-time use: once the transfer finishes, it stops working.",
       helpNote4: "If the connection drops mid-transfer, you can share the same link again to retry.",
@@ -1242,7 +1252,7 @@
       }
     }
 
-    const peer = new Peer();
+    const peer = new Peer(PEER_OPTIONS);
     peer.on('open', () => {
       const conn = peer.connect(receiveId, { reliable: true });
       conn.on('open', () => {
@@ -1467,7 +1477,7 @@
     }
 
     function startPeer(idRetriesLeft) {
-      peer = new Peer(generateShortId());
+      peer = new Peer(generateShortId(), PEER_OPTIONS);
 
       peer.on('open', (id) => {
         const url = location.origin + location.pathname + '#r=' + id;

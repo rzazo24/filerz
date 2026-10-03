@@ -1,7 +1,7 @@
 {
   "name": "Filerz — transferencia directa de archivos",
   "short_name": "Filerz",
-  "description": "Transferencia de archivos peer-to-peer directo entre navegadores por WebRTC, sin pasar por ningún servidor.",
+  "description": "Transferencia de archivos peer-to-peer entre navegadores por WebRTC, sin guardar nada en ningún servidor.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
